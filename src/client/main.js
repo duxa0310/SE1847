@@ -1,4 +1,5 @@
 import * as mth from "./mth/mth.ts";
+import * as time from "./anim/timer.ts";
 
 let socket;
 
@@ -19,7 +20,11 @@ function main() {
         socket.on("disconnect", () => {
             console.log("Disconnected:", socket.id);
         });
+        
     });
+    time.timerInit();
+    time.timerResponse();
+    console.log(time.getTimeContext());
     console.log(mth.degreesToRadians(180));
 }
 
