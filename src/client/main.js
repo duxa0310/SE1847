@@ -1,3 +1,5 @@
+import * as mth from "./mth/mth.ts";
+
 let socket;
 
 function main() {
@@ -18,6 +20,7 @@ function main() {
             console.log("Disconnected:", socket.id);
         });
     });
+    console.log(mth.degreesToRadians(180));
 }
 
 main();

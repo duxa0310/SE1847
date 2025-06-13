@@ -17,7 +17,7 @@ module.exports = {
       browser: true,
     }),
     commonjs(),
-    // typescript(),
+    typescript(),
     // terser()
   ],
 };
