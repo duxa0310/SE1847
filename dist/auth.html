@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login into the game</title>
+    <link rel = "icon" type = "image/x-icon" href = "./bin/images/favicon.ico">
+  </head>
+  <body>
+    <div>
+      <h1>Login</h1>
+      <form id = "login-form">
+        <input type = "text" id = "username-input" placeholder = "nickname" required />
+        <button type = "submit">Login</button>
+      </form>
+      <div id = "error-text"></div>
+    </div>
+    <script>
+      document.getElementById("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = document.getElementById("username-input").value;
+        const errorPane = document.getElementById("error-text");
+        try {
+          const response = await fetch("/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username }),
+          });
+          const data = await response.json();
+          if (data.success) {
+            localStorage.setItem("username", username);
+            window.location.href = "/game";
+          } else { errorPane.textContent = data.error; }
+        } catch (error) {
+            errorPane.textContent = "Connection error";
+        }
+      });
+    </script>
+  </body>
+</html>
