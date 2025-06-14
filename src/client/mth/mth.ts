@@ -145,6 +145,18 @@ export function vec2Set(x: number, y: number): vec2 {
   return new vec2(x, y);
 }
 
+export function vec2Set1(a: number): vec2 {
+  return vec2Set(a, a);
+}
+
+export function vec4Set(x: number, y: number, z: number, w: number): vec4 {
+  return new vec4(x, y, z, w);
+}
+
+export function vec4Set1(a: number): vec4 {
+  return vec4Set(a, a, a, a);
+}
+
 export function vec3Set(x: number, y: number, z: number): vec3 {
   return new vec3(x, y, z);
 }
@@ -553,14 +565,6 @@ export function noise1D(x: number): number {
     tabNoise[ix1] * fx;
 }
 
-export function noise1D2D(x: number): vec2 {
-  return vec2Set(noise1D(x), noise1D(x + 4.7));
-}
-
-export function noise1D3D(x: number): vec3 {
-  return vec3Set(noise1D(x), noise1D(x + 3.47), noise1D(x - 8.30));
-}
-
 export function noise2D(x: number, y: number): number {
   let ix: number = Math.floor(x), ix1: number, fx: number = x - ix;
   let iy: number = Math.floor(y), iy1: number, fy: number = y - iy;
@@ -577,15 +581,6 @@ export function noise2D(x: number, y: number): number {
     tabNoise[index2(iy, ix1)] * fx * (1 - fy) +
     tabNoise[index2(iy1, ix)] * (1 - fx) * fy +
     tabNoise[index2(iy1, ix1)] * fx * fy;
-}                                          
-
-
-export function noise2D2D(x: number, y: number): vec2 {
-  return vec2Set(noise2D(x, y), noise2D(x + 4.7, y - 1.02));
-}
-
-export function noise2D3D(x: number, y: number): vec3 {
-  return vec3Set(noise2D(x, y), noise2D(x + 3.8, y + 0.2), noise2D(x - 8.30, y + 1.4));
 }
 
 export function noise3D(x: number, y: number, z: number): number {
@@ -613,14 +608,6 @@ export function noise3D(x: number, y: number, z: number): number {
     tabNoise[index3(ix, iy1, iz1)] * (1 - fx) * fy * fz +
     tabNoise[index3(ix1, iy, iz1)] * fx * (1 - fy) * fz +
     tabNoise[index3(iz1, iy1, ix1)] * fx * fy * fz;
-}
-
-export function noise3D2D(x: number, y: number, z: number): vec2 {
-  return vec2Set(noise3D(x, y, z), noise3D(x + 4.7, y - 1.02, z + 0.8));
-}
-
-export function noise3D3D(x: number, y: number, z: number): vec3 {
-  return vec3Set(noise3D(x, y, z), noise3D(x + 3.8, y + 0.2, z - 0.47), noise3D(x - 8.30, y + 1.4, z - 1.2));
 }
 
 export function noiseTurb1D(x: number, octaves: number): number {
@@ -656,12 +643,19 @@ export function noiseTurb2D(x: number, y: number, octaves: number): number {
   return val * (2.0 - 1.0 / (1 << octaves));
 }
 
-export function noiseTurb2D2D(x: number, y: number, octaves: number): vec2 {
-  return vec2Set(noiseTurb2D(x, y, octaves), noiseTurb2D(x + 4.7, y - 3.4, octaves));
+export function noise2Turb2D(x: number, y: number, octaves: number): vec2 {
+  return vec2Set(
+    noiseTurb2D(x, y, octaves),
+    noiseTurb2D(x + 0.102, y + 0.30, octaves)
+  );
 }
 
-export function noiseTurb2D3D(x: number, y: number, octaves: number): vec3 {
-  return vec3Set(noiseTurb2D(x, y, octaves), noiseTurb2D(x + 3.47, y - 7.2, octaves), noiseTurb2D(x - 8.30, y + 14.1, octaves));
+export function noise3Turb2D(x: number, y: number, octaves: number): vec3 {
+  return vec3Set(
+    noiseTurb2D(x, y, octaves),
+    noiseTurb2D(x + 0.102, y + 0.30, octaves),
+    noiseTurb2D(x + 0.47, y + 0.8, octaves)
+  );
 }
 
 export function noiseTurb3D(x: number, y: number, z: number, octaves: number): number {
@@ -678,11 +672,17 @@ export function noiseTurb3D(x: number, y: number, z: number, octaves: number): n
   return val * (2.0 - 1.0 / (1 << octaves));
 }
 
-export function noiseTurb3D2D(x: number, y: number, z: number, octaves: number): vec2 {
-  return vec2Set(noiseTurb3D(x, y, z, octaves), noiseTurb3D(x + 4.7, y - 3.4, z + 9.2, octaves));
+export function noise2Turb3D(x: number, y: number, z: number, octaves: number): vec2 {
+  return vec2Set(
+    noiseTurb3D(x, y, z, octaves),
+    noiseTurb3D(x + 0.102, y + 0.30, z + 0.47, octaves)
+  );
 }
 
-export function noiseTurb3D3D(x: number, y: number, z: number, octaves: number): vec3 {
-  return vec3Set(noiseTurb3D(x, y, z, octaves), noiseTurb3D(x + 3.47, y - 7.2, z - 4.6, octaves),
-    noiseTurb3D(x - 8.30, y + 14.1, y - 1.30, octaves));
+export function noise3Turb3D(x: number, y: number, z: number, octaves: number): vec3 {
+  return vec3Set(
+    noiseTurb3D(x, y, z, octaves),
+    noiseTurb3D(x + 0.102, y + 0.30, z + 0.47, octaves),
+    noiseTurb3D(x + 0.30, y + 0.47, y + 0.8, octaves)
+  );
 }
