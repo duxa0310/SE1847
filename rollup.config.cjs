@@ -15,6 +15,7 @@ module.exports = {
       jsnext: true,
       main: true,
       browser: true,
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
     }),
     commonjs(),
     typescript(),

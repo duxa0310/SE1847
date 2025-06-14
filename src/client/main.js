@@ -1,5 +1,5 @@
 import * as mth from "./mth/mth.ts";
-import * as time from "./anim/timer.ts";
+import * as anim from "./anim/anim.ts";
 
 let socket;
 
@@ -20,12 +20,13 @@ function main() {
         socket.on("disconnect", () => {
             console.log("Disconnected:", socket.id);
         });
-        
+
     });
-    time.timerInit();
-    time.timerResponse();
-    console.log(time.getTimeContext());
     console.log(mth.degreesToRadians(180));
+    window.canvas = document.getElementById("webgl-canvas");
+    window.gl = canvas.getContext("webgl2");
+    anim.animInit();
+    anim.animRender();
 }
 
 main();
