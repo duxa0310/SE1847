@@ -1,5 +1,23 @@
-layout (location = 0) in vec2 a_pos;
+layout(location = 0) in vec3 InPosition;
+layout(location = 1) in vec2 InTexCoord;
+layout(location = 2) in vec3 InNormal;
+layout(location = 3) in vec4 InColor;
 
-void main() {
-    gl_Position = vec4(a_pos, 0.0, 1.0);
+out vec3 DrawPos;
+out vec2 DrawTexCoord;
+out vec3 DrawNormal;
+out vec4 DrawColor;
+
+uniform mat4 MatrWVP;
+uniform mat4 MatrW;
+
+void main( void ) 
+{
+  gl_Position = MatrWVP * vec4(InPosition, 1);
+  mat4 MatrWInv = inverse(transpose(MatrW));
+
+  DrawPos = (MatrW * vec4(InPosition, 1.0)).xyz;
+  DrawTexCoord = InTexCoord;
+  DrawNormal = mat3(MatrWInv) * normalize(InNormal);
+  DrawColor = vec4(InColor);
 }
