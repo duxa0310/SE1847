@@ -11,7 +11,7 @@ export async function loadTextFromFile(filePath) {
 
 let socket;
 
-function main() {
+async function main() {
     const username = localStorage.getItem('username');
     if (!username) {
         window.location.href = '/';
@@ -33,7 +33,8 @@ function main() {
     console.log(mth.degreesToRadians(180));
     window.canvas = document.getElementById("webgl-canvas");
     window.gl = canvas.getContext("webgl2");
-    anim.animInit();
+
+    await anim.animInit();
     anim.animRender();
 }
 

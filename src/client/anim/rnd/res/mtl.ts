@@ -2,6 +2,8 @@ import { vec2, vec3, vec4 } from "../../../mth/mth.ts"
 import * as mth from "../../../mth/mth.ts"
 import { Shader, shdGetDefault } from "./shd.ts"
 
+const mtlDict: Material[] = [];
+
 export class Material {
   name: string;
   ka: vec3; kd: vec3; ks: vec3;
@@ -32,10 +34,8 @@ export function mtlCreate(name: string, ka: vec3, kd: vec3, ks: vec3, ph: number
   return new Material(name, ka, kd, ks, ph, trans, shdGetDefault());
 }
 
-let mtlDict: Material[];
-
 export function mtlInit() {
-  mtlDict = [
+  mtlDict.push(
     mtlCreate("Default", mth.vec3Set1(0.5), mth.vec3Set1(0.8), mth.vec3Set1(0.3), 30, 1),
     mtlCreate("Void", mth.vec3Set(0, 0, 0), mth.vec3Set(0, 0, 0), mth.vec3Set(0, 0, 0), 0, 1),
     mtlCreate("Black Plastic", mth.vec3Set(0.0, 0.0, 0.0), mth.vec3Set(0.01, 0.01, 0.01), mth.vec3Set(0.5, 0.5, 0.5), 32, 1),
@@ -58,7 +58,7 @@ export function mtlInit() {
     mtlCreate("Emerald", mth.vec3Set(0.0215, 0.1745, 0.0215), mth.vec3Set(0.07568, 0.61424, 0.07568), mth.vec3Set(0.633, 0.727811, 0.633), 76.8, 1),
     mtlCreate("Black Plastic", mth.vec3Set(0.0, 0.0, 0.0), mth.vec3Set(0.01, 0.01, 0.01), mth.vec3Set(0.5, 0.5, 0.5), 32.0, 1),
     mtlCreate("Black Rubber", mth.vec3Set(0.02, 0.02, 0.02), mth.vec3Set(0.01, 0.01, 0.01), mth.vec3Set(0.4, 0.4, 0.4), 10.0, 1),
-  ];
+  );
 }
 
 export function mtlGetDefault(): Material {
