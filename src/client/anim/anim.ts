@@ -5,7 +5,7 @@ import * as input from "./input.ts"
 declare global {
   interface Window {
     canvas: HTMLCanvasElement;
-    gl: WebGLRenderingContext;
+    gl: WebGL2RenderingContext;
   }
 }
 

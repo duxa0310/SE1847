@@ -1,6 +1,14 @@
 import * as mth from "./mth/mth.ts";
 import * as anim from "./anim/anim.ts";
 
+export async function loadTextFromFile(filePath) {
+    const sourceText = fetch(filePath)
+        .then((response) => response.text())
+        .then((text) => text)
+        .catch((err) => console.err(err));
+    return sourceText;
+}
+
 let socket;
 
 function main() {
