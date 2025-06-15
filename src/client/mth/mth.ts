@@ -2,87 +2,162 @@
  * MATH CONSTANTS & CONVERTATION
  ***/
 
+/* Pi number constant */
 export const PI: number = 3.1415926535897932384626433832795;
 
+/* Convert degrees to radians function.
+ * PARAMS:
+ *   - angle in degrees:
+ *       a: number;
+ * RETURNS:
+ *   (number) angle in radians.
+ */
 export function degreesToRadians(a: number): number {
   return a * (PI / 180.0);
-}
+} /* End of 'degreesToRadians' function */
 
+/* Convert degrees to radians function redefinition */
 export const d2R: Function = degreesToRadians;
 
+/* Convert radians to degrees function.
+ * PARAMS:
+ *   - angle in radians:
+ *       a: number;
+ * RETURNS:
+ *   (number) angle in degrees.
+ */
 export function radiansToDegrees(a: number): number {
   return a * (180.0 / PI);
-}
+} /* End of 'radiansToDegrees' function */
 
+/* Convert radians to degrees function redefinition */
 export const r2D: Function = radiansToDegrees;
 
 /***
  * CLASSES DEFINITIONS
  ***/
 
+/* 2-dimensional vector class. */
 export class vec2 {
-  x: number;
-  y: number;
+  x: number; // abscissa
+  y: number; // ordinate
 
+  /* 2-dimensional vector class constructor.
+   * PARAMS:
+   *   - vector coordinates: 
+   *       x, y: number;
+   * RETURNS:
+   *   (vec2) vector object. 
+   */
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
-  }
+  } /* End of 'vec2' constructor */
 
+  /* Get coordinates as list method.
+  * RETURNS:
+  *   (number[]) vector coordinates list.
+  */
   toList(): number[] {
     return [this.x, this.y];
-  }
+  } /* End of 'toList' function */
 
+  /* Get coordinates as float32 array method.
+  * RETURNS:
+  *   (Float32Array) vector coordinates array.
+  */
   toArray(): Float32Array {
     return new Float32Array(this.toList());
-  }
+  } /* End of 'toArray' function */
 }
 
+/* 3-dimensional vector class. */
 export class vec3 {
-  x: number;
-  y: number;
-  z: number;
+  x: number; // abscissa
+  y: number; // ordinate
+  z: number; // applicate
 
+  /* 3-dimensional vector class constructor.
+   * PARAMS:
+   *   - vector coordinates: 
+   *       x, y, z: number;
+   * RETURNS:
+   *   (vec3) vector object. 
+   */
   constructor(x: number, y: number, z: number) {
     this.x = x;
     this.y = y;
     this.z = z;
-  }
+  } /* End of 'vec3' constructor */
 
+  /* Get coordinates as list method.
+  * RETURNS:
+  *   (number[]) vector coordinates list.
+  */
   toList(): number[] {
     return [this.x, this.y, this.z];
-  }
+  } /* End of 'toList' function */
 
+  /* Get coordinates as float32 array method.
+  * RETURNS:
+  *   (Float32Array) vector coordinates array.
+  */
   toArray(): Float32Array {
     return new Float32Array(this.toList());
-  }
+  } /* End of 'toArray' function */
 }
 
+/* 4-dimensional vector class. */
 export class vec4 {
-  x: number;
-  y: number;
-  z: number;
-  w: number;
+  x: number; // abscissa
+  y: number; // ordinate
+  z: number; // applicate
+  w: number; // alpha / depth
 
+  /* 4-dimensional vector class constructor.
+   * PARAMS:
+   *   - vector coordinates: 
+   *       x, y, z, w: number;
+   * RETURNS:
+   *   (vec4) vector object. 
+   */
   constructor(x: number, y: number, z: number, w: number) {
     this.x = x;
     this.y = y;
     this.z = z;
     this.w = w;
-  }
+  } /* End of 'vec4' constructor */
 
+  /* Get coordinates as list method.
+  * RETURNS:
+  *   (number[]) vector coordinates list.
+  */
   toList(): number[] {
     return [this.x, this.y, this.z, this.w];
-  }
+  } /* End of 'toList' function */
 
+  /* Get coordinates as float32 array method.
+  * RETURNS:
+  *   (Float32Array) vector coordinates array.
+  */
   toArray(): Float32Array {
     return new Float32Array(this.toList());
-  }
+  } /* End of 'toArray' function */
 }
 
+/* 3x3 matrix class. */
 export class mat3 {
-  a: number[][];
+  a: number[][]; // matrix elements
 
+  /* 3x3 matrix class constructor.
+   * PARAMS:
+   *   - matrix elements: 
+   *       a00, a01, a02,
+   *       a10, a11, a12, 
+   *       a20, a21, a22: number;
+   * RETURNS:
+   *   (mat3) matrix object. 
+   */
   constructor(
     a00: number, a01: number, a02: number,
     a10: number, a11: number, a12: number,
@@ -92,24 +167,43 @@ export class mat3 {
       [a10, a11, a12],
       [a20, a21, a22],
     ];
-  }
+  } /* End of 'mat3' constructor */
 
+  /* Get elements as list method.
+  * RETURNS:
+  *   (number[]) matrix elements list.
+  */
   toList(): number[] {
     return [
       this.a[0][0], this.a[0][1], this.a[0][2],
       this.a[1][0], this.a[1][1], this.a[1][2],
       this.a[2][0], this.a[2][1], this.a[2][2],
     ];
-  }
+  } /* End of 'toList' function */
 
+  /* Get elements as float32 array method.
+  * RETURNS:
+  *   (Float32Array) matrix elements array.
+  */
   toArray(): Float32Array {
     return new Float32Array(this.toList());
-  }
+  } /* End of 'toArray' function */
 }
 
+/* 4x4 matrix class. */
 export class mat4 {
-  a: number[][];
+  a: number[][]; // matrix elements
 
+  /* 4x4 matrix class constructor.
+   * PARAMS:
+   *   - matrix elements: 
+   *       a00, a01, a02, a03
+   *       a10, a11, a12, a13
+   *       a20, a21, a22, a23
+   *       a30, a31, a32, a33: number;
+   * RETURNS:
+   *   (mat4) matrix object. 
+   */
   constructor(
     a00: number, a01: number, a02: number, a03: number,
     a10: number, a11: number, a12: number, a13: number,
@@ -121,8 +215,12 @@ export class mat4 {
       [a20, a21, a22, a23],
       [a30, a31, a32, a33]
     ];
-  }
+  } /* End of 'mat4' constructor */
 
+  /* Get elements as list method.
+  * RETURNS:
+  *   (number[]) matrix elements list.
+  */
   toList(): number[] {
     return [
       this.a[0][0], this.a[0][1], this.a[0][2], this.a[0][3],
@@ -130,15 +228,19 @@ export class mat4 {
       this.a[2][0], this.a[2][1], this.a[2][2], this.a[2][3],
       this.a[3][0], this.a[3][1], this.a[3][2], this.a[3][3]
     ];
-  }
+  } /* End of 'toList' function */
 
+  /* Get elements as float32 array method.
+  * RETURNS:
+  *   (Float32Array) matrix elements array.
+  */
   toArray(): Float32Array {
     return new Float32Array(this.toList());
-  }
+  } /* End of 'toArray' function */
 }
 
 /***
- * VECTOR MATH
+ * 2D VECTOR MATH
  ***/
 
 export function vec2Set(x: number, y: number): vec2 {
@@ -149,13 +251,64 @@ export function vec2Set1(a: number): vec2 {
   return vec2Set(a, a);
 }
 
-export function vec4Set(x: number, y: number, z: number, w: number): vec4 {
-  return new vec4(x, y, z, w);
+export function vec2SetArray(arr: number[]): vec2 {
+  return vec2Set(arr[0], arr[1]);
 }
 
-export function vec4Set1(a: number): vec4 {
-  return vec4Set(a, a, a, a);
+export function vec2AddVec2(v1: vec2, v2: vec2): vec2 {
+  return vec2Set(v1.x + v2.x, v1.y + v2.y);
 }
+
+export function vec2SubVec2(v1: vec2, v2: vec2): vec2 {
+  return vec2Set(v1.x - v2.x, v1.y - v2.y);
+}
+
+export function vec2MulNum(v: vec2, n: number): vec2 {
+  return vec2Set(v.x * n, v.y * n);
+}
+
+export function vec2MulVec2(v1: vec2, v2: vec2): vec2 {
+  return vec2Set(v1.x * v2.x, v1.y * v2.y);
+}
+
+export function vec2DivNum(v: vec2, n: number): vec2 {
+  if (n == 0) {
+    return vec2Set1(0);
+  }
+  return vec2Set(v.x / n, v.y / n);
+}
+
+export function vec2DivVec2(v1: vec2, v2: vec2): vec2 {
+  if (v2.x == 0 || v2.y == 0) {
+    return vec2Set1(0);
+  }
+  return vec2Set(v1.x / v2.x, v1.y / v2.y);
+}
+
+export function vec2Neg(v: vec2): vec2 {
+  return vec2MulNum(v, -1);
+}
+
+export function vec2DotVec2(v1: vec2, v2: vec2): number {
+  return v1.x * v2.x + v1.y * v2.y;
+}
+
+export function vec2Len(v: vec2): number {
+  return Math.sqrt(vec2DotVec2(v, v));
+}
+
+export function vec2Normalize(v: vec2): vec2 {
+  const len = vec2Len(v);
+  if (len == 0 || len == 1) {
+    return v;
+  } else {
+    return vec2DivNum(v, len);
+  }
+}
+
+/***
+ * 3D VECTOR MATH
+ ***/
 
 export function vec3Set(x: number, y: number, z: number): vec3 {
   return new vec3(x, y, z);
@@ -246,12 +399,99 @@ export function pointTransform(v: vec3, m: mat4): vec3 {
   );
 }
 
-export function vectorTransform(v: vec3, m: mat4): vec3 {
+export function vec3Transform(v: vec3, m: mat4): vec3 {
   return vec3Set(
     v.x * m.a[0][0] + v.y * m.a[1][0] + v.z * m.a[2][0],
     v.x * m.a[0][1] + v.y * m.a[1][1] + v.z * m.a[2][1],
     v.x * m.a[0][2] + v.y * m.a[1][2] + v.z * m.a[2][2]
   );
+}
+
+/***
+ * 4D VECTOR MATH
+ ***/
+
+export function vec4Set(x: number, y: number, z: number, w: number): vec4 {
+  return new vec4(x, y, z, w);
+}
+
+export function vec4Set1(a: number): vec4 {
+  return vec4Set(a, a, a, a);
+}
+
+export function vec4SetArray(arr: number[]): vec4 {
+  return vec4Set(arr[0], arr[1], arr[2], arr[3]);
+}
+
+export function vec4AddVec4(v1: vec4, v2: vec4): vec4 {
+  return vec4Set(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w);
+}
+
+export function vec4SubVec4(v1: vec4, v2: vec4): vec4 {
+  return vec4Set(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z, v1.w - v2.w);
+}
+
+export function vec4MulNum(v: vec4, n: number): vec4 {
+  return vec4Set(v.x * n, v.y * n, v.z * n, v.w * n);
+}
+
+export function vec4MulVec4(v1: vec4, v2: vec4): vec4 {
+  return vec4Set(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z, v1.w * v2.w);
+}
+
+export function vec4DivNum(v: vec4, n: number): vec4 {
+  if (n == 0) {
+    return vec4Set1(0);
+  }
+  return vec4Set(v.x / n, v.y / n, v.z / n, v.w / n);
+}
+
+export function vec4DivVec4(v1: vec4, v2: vec4): vec4 {
+  if (v2.x == 0 || v2.y == 0 || v2.z == 0 || v2.w == 0) {
+    return vec4Set1(0);
+  }
+  return vec4Set(v1.x / v2.x, v1.y / v2.y, v1.z / v2.z, v1.w / v2.w);
+}
+
+export function vec4Neg(v: vec4): vec4 {
+  return vec4MulNum(v, -1);
+}
+
+export function vec4DotVec4(v1: vec4, v2: vec4): number {
+  return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+}
+
+
+export function vec4Len(v: vec4): number {
+  return Math.sqrt(vec4DotVec4(v, v));
+}
+
+export function vec4Normalize(v: vec4): vec4 {
+  const len = vec4Len(v);
+  if (len == 0 || len == 1) {
+    return v;
+  } else {
+    return vec4DivNum(v, len);
+  }
+}
+
+export function vec4NormalizeDepth(v: vec4): vec4 {
+  if (v.w == 0) {
+    return vec4Set1(0);
+  } else {
+    return vec4DivNum(v, v.w);
+  }
+}
+
+export function vec4MulMat4(v: vec4, m: mat4): vec4 {
+  const w = v.x * m.a[0][3] + v.y * m.a[1][3] + v.z * m.a[2][3] + v.w * m.a[3][3];
+
+  return vec4DivNum(vec4Set(
+    v.x * m.a[0][0] + v.y * m.a[1][0] + v.z * m.a[2][0] + m.a[3][0],
+    v.x * m.a[0][1] + v.y * m.a[1][1] + v.z * m.a[2][1] + m.a[3][1],
+    v.x * m.a[0][2] + v.y * m.a[1][2] + v.z * m.a[2][2] + m.a[3][2],
+    v.x * m.a[0][3] + v.y * m.a[1][3] + v.z * m.a[2][3] + m.a[3][3]
+  ), w);
 }
 
 /***
