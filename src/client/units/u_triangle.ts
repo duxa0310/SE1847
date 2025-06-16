@@ -11,7 +11,7 @@ export class UnitTriangle extends Unit {
     this.name = "Triangle";
   }
 
-  init() {
+  async init() {
     this.prim = prim.primCreate(window.gl.TRIANGLES, mtl.mtlGetDefault(), [
       new prim.Vertex(mth.vec3Set(0, 1, 0), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 0), mth.vec4Set(0.96, 0.95, 0.41, 1)),
       new prim.Vertex(mth.vec3Set(1, 0, 0), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 0), mth.vec4Set(0.36, 0.70, 0.44, 1)),

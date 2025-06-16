@@ -5,7 +5,7 @@ export class Unit {
     this.name = name;
   }
 
-  init() { }
+  async init() { }
   response() { }
   render() { }
 }
