@@ -2,6 +2,7 @@ import { loadTextFromFile } from "../../main.js";
 import { vec2, vec3, vec4 } from "../../mth/mth.ts"
 import * as mth from "../../mth/mth.ts"
 import { Material } from "./res/mtl.ts"
+import { getRenderContext } from "./rnd.ts";
 
 export class Vertex {
   position: vec3;
@@ -79,6 +80,27 @@ export class Primitive {
     }
     else {
       this.numOfElements = vertices.length;
+    }
+  }
+
+  draw(matrW: mth.mat4) {
+    this.mtl.apply();
+
+    window.gl.uniformMatrix4fv(window.gl.getUniformLocation(this.mtl.shd.program, "MatrW"), false,
+      matrW.toArray());
+
+    const matrWVP: mth.mat4 = mth.mat4MulMat4(matrW, getRenderContext().matrVP);
+    window.gl.uniformMatrix4fv(window.gl.getUniformLocation(this.mtl.shd.program, "MatrWVP"), false,
+      matrWVP.toArray());
+
+    window.gl.bindVertexArray(this.vA);
+
+    if (this.iBuf == undefined) {
+      window.gl.drawArrays(this.glType, 0, this.numOfElements);
+    }
+    else {
+      window.gl.bindBuffer(window.gl.ELEMENT_ARRAY_BUFFER, this.iBuf);
+      window.gl.drawElements(this.glType, this.numOfElements, window.gl.UNSIGNED_INT, 0);
     }
   }
 }
