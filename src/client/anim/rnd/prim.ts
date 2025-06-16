@@ -18,10 +18,10 @@ export class Vertex {
   }
 
   toList(): number[] {
-    return this.position.toList().concat(
-      this.texCoord.toList(),
-      this.normal.toList(),
-      this.color.toList()
+    return [this.position.x, this.position.y, this.position.z].concat(
+      [this.texCoord.x, this.texCoord.x],
+      [this.normal.x, this.normal.y, this.normal.z],
+      [this.color.x, this.color.y, this.color.z, this.color.w]
     );
   }
 
@@ -52,7 +52,7 @@ export class Primitive {
 
   constructor(glType: number, mtl: Material, vertices: Vertex[], indices: number[]) {
     this.glType = glType;
-    this.mtl = structuredClone(mtl);
+    this.mtl = mtl;
     if (vertices.length > 0) {
       this.vBuf = window.gl.createBuffer();
       this.vA = window.gl.createVertexArray();

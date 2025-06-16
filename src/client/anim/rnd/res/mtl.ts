@@ -24,9 +24,9 @@ export class Material {
   apply() {
     window.gl.useProgram(this.shd.program);
 
-    window.gl.uniform3fv(window.gl.getUniformLocation(this.shd.program, "Ka"), this.ka.toArray(), 0, 0);
-    window.gl.uniform4fv(window.gl.getUniformLocation(this.shd.program, "KdTrans"), new Float32Array(this.kd.toList().concat(this.trans)), 0, 0);
-    window.gl.uniform4fv(window.gl.getUniformLocation(this.shd.program, "KsPh"), new Float32Array(this.ks.toList().concat(this.trans)), 0, 0);
+    window.gl.uniform3fv(window.gl.getUniformLocation(this.shd.program, "Ka"), new Float32Array([this.ka.x, this.ka.y, this.ka.z]), 0, 0);
+    window.gl.uniform4fv(window.gl.getUniformLocation(this.shd.program, "KdTrans"), new Float32Array([this.kd.x, this.kd.y, this.kd.z, this.trans]), 0, 0);
+    window.gl.uniform4fv(window.gl.getUniformLocation(this.shd.program, "KsPh"), new Float32Array([this.ks.x, this.ks.y, this.ks.z, this.ph]), 0, 0);
   }
 }
 
