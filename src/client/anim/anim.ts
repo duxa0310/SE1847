@@ -26,7 +26,6 @@ export async function animInit() {
 
 export function animRender() {
   time.timerResponse();
-  input.inputResponse();
   rnd.rndStart();
   triangle.render();
   window.requestAnimationFrame(animRender);
