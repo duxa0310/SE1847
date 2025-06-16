@@ -92,6 +92,10 @@ export function rndStart() {
 export function rndInit() {
   window.gl.blendFunc(window.gl.SRC_ALPHA, window.gl.ONE_MINUS_SRC_ALPHA);
   window.gl.enable(window.gl.DEPTH_TEST);
+  window.onresize = () => {
+    rndProjSet(document.documentElement.clientWidth,
+      document.documentElement.clientHeight);
+  };
 
   projSize = 0.1;
   projDist = projSize;
