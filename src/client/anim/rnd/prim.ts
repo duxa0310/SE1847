@@ -1,4 +1,4 @@
-import { loadTextFromFile } from "../../main.js";
+import { loadTextFromFile } from "../../utils.js";
 import { vec2, vec3, vec4 } from "../../mth/mth.ts"
 import * as mth from "../../mth/mth.ts"
 import { Material } from "./res/mtl.ts"
