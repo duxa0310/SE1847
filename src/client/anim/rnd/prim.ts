@@ -19,7 +19,7 @@ export class Vertex {
 
   toList(): number[] {
     return [this.position.x, this.position.y, this.position.z].concat(
-      [this.texCoord.x, this.texCoord.x],
+      [this.texCoord.x, this.texCoord.y],
       [this.normal.x, this.normal.y, this.normal.z],
       [this.color.x, this.color.y, this.color.z, this.color.w]
     );
@@ -34,7 +34,7 @@ export class Vertex {
   }
 }
 
-function vertexArrayToFloatArray(vertices: Vertex[]) {
+function vertexArrayToFloatArray(vertices: Vertex[]): Float32Array {
   let list: number[] = [];
   for (let i: number = 0; i < vertices.length; i++) {
     list = list.concat(vertices[i].toList());
@@ -105,7 +105,7 @@ export class Primitive {
   }
 }
 
-export function primCreate(glType: number, mtl: Material, vertices: Vertex[], indices: number[]) {
+export function primCreate(glType: number, mtl: Material, vertices: Vertex[], indices: number[]): Primitive {
   return new Primitive(glType, mtl, vertices, indices);
 }
 

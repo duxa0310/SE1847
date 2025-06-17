@@ -1,6 +1,7 @@
 import { vec2, vec3, vec4 } from "../../../mth/mth.ts"
 import * as mth from "../../../mth/mth.ts"
 import { Shader, shdGetDefault } from "./shd.ts"
+import { Texture } from "./tex.ts"
 
 const mtlDict: Material[] = [];
 
@@ -9,6 +10,7 @@ export class Material {
   ka: vec3; kd: vec3; ks: vec3;
   ph: number; trans: number;
   shd: Shader;
+  textures: Texture[] = [];
 
   constructor(name: string, ka: vec3, kd: vec3, ks: vec3, ph: number, trans: number, shd: Shader) {
     this.name = name;
@@ -27,6 +29,12 @@ export class Material {
     window.gl.uniform3fv(window.gl.getUniformLocation(this.shd.program, "Ka"), new Float32Array([this.ka.x, this.ka.y, this.ka.z]), 0, 0);
     window.gl.uniform4fv(window.gl.getUniformLocation(this.shd.program, "KdTrans"), new Float32Array([this.kd.x, this.kd.y, this.kd.z, this.trans]), 0, 0);
     window.gl.uniform4fv(window.gl.getUniformLocation(this.shd.program, "KsPh"), new Float32Array([this.ks.x, this.ks.y, this.ks.z, this.ph]), 0, 0);
+
+    for (let i: number = 0; i < this.textures.length; i++) {
+      window.gl.activeTexture(window.gl.TEXTURE0 + i);
+      window.gl.bindTexture(window.gl.TEXTURE_2D, this.textures[i].id);
+      window.gl.uniform1i(window.gl.getUniformLocation(this.shd.program, "Tex" + i), 0);
+    }
   }
 }
 

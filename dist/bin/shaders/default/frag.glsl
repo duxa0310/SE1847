@@ -9,7 +9,10 @@ uniform vec3 Ka;
 uniform vec4 KdTrans;
 uniform vec4 KsPh;
 
+uniform sampler2D Tex0;
+
 void main()
-{
-  OutColor = vec4(Ka * DrawColor.xyz, KdTrans.w); 
+{                                         
+  vec4 color = texture(Tex0, DrawTexCoord);
+  OutColor = vec4(color.xyz, KdTrans.w); 
 }
