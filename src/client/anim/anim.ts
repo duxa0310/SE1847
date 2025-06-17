@@ -5,7 +5,7 @@ import * as shd from "./rnd/res/shd.ts";
 import * as mtl from "./rnd/res/mtl.ts";
 import { UnitTriangle } from "../units/u_triangle.ts"
 import * as units from "../units/units.ts"
-import { UnitAxis } from "../units/a_axis.ts";
+import { UnitAxis } from "../units/u_axis.ts";
 
 declare global {
   interface Window {
