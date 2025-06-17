@@ -21,7 +21,6 @@ vec3 Shade( vec3 Pos, vec3 N, vec3 Kd, vec3 Ks, float Ph, vec3 L, vec3 LC ) {
   vec3 color = vec3(0), V = normalize(Pos - CamLoc);
  
   N = faceforward(N, V, N);
-
   color += max(0.1, dot(N, L)) * Kd * LC;
 
   vec3 R = reflect(V, N);
@@ -32,12 +31,15 @@ vec3 Shade( vec3 Pos, vec3 N, vec3 Kd, vec3 Ks, float Ph, vec3 L, vec3 LC ) {
 
 void main()
 {                                 
-  vec4 color;        
+  vec4 color;       
   if (IsTexture0) {
     color = texture(Tex0, DrawTexCoord); 
   } else {
-    color = 0.47 * vec4(Ka * DrawColor.xyz + Shade(DrawPos, normalize(DrawNormal), 
-      KdTrans.xyz, KsPh.xyz, KsPh.w, normalize(vec3(0.0, 1.0, 0.0)), vec3(1.0, 1.0, 1.0)), 1.0);
+    color = vec4(Ka * DrawColor.xyz, 1.0);
   }
+
+  color.xyz *= Shade(DrawPos, normalize(DrawNormal), 
+      KdTrans.xyz, KsPh.xyz, KsPh.w, normalize(vec3(0.0, 1.0, 0.0)), vec3(1.0, 1.0, 1.0));
+  
   OutColor = vec4(color.xyz, KdTrans.w); 
 }

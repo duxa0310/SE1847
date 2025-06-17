@@ -14,7 +14,8 @@ export class UnitSquare extends Unit {
   }
 
   async init() {
-    const mtlSquare: mtl.Material = new mtl.Material("Square material", mth.vec3Set1(0.5), mth.vec3Set1(0.8), mth.vec3Set1(0.3), 30, 1, shd.shdGetDefault());
+    const mtlSquare: mtl.Material = new mtl.Material("Square material", mth.vec3Set1(1), mth.vec3Set1(1), mth.vec3Set1(1), 30, 1, 
+      shd.shdGetByName("plain"));
     mtlSquare.textures[0] = tex.texCreateImage("Square texture", "bin/textures/LOGO30.bmp", 1, 1);
     this.prim = prim.primCreate(window.gl.TRIANGLE_STRIP, mtlSquare, [
       new prim.Vertex(mth.vec3Set(0, 0, 0), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 0), mth.vec4Set(0.96, 0.95, 0.41, 1)),
