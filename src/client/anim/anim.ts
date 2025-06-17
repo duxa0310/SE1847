@@ -6,7 +6,7 @@ import * as mtl from "./rnd/res/mtl.ts";
 import * as units from "../units/units.ts"
 import { UnitSkybox } from "../units/u_skybox.ts";
 import { UnitAxis } from "../units/u_axis.ts";
-import { UnitTriangle } from "../units/u_triangle.ts"
+import { UnitSquare } from "../units/u_square.ts";
 
 declare global {
   interface Window {
@@ -23,7 +23,7 @@ export async function animInit() {
   mtl.mtlInit();
   units.unitAdd(new UnitSkybox());
   units.unitAdd(new UnitAxis());
-  units.unitAdd(new UnitTriangle());
+  units.unitAdd(new UnitSquare());
   await units.unitsInit();
 }
 
