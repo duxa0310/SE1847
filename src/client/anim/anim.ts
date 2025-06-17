@@ -5,6 +5,7 @@ import * as shd from "./rnd/res/shd.ts";
 import * as mtl from "./rnd/res/mtl.ts";
 import { UnitTriangle } from "../units/u_triangle.ts"
 import * as units from "../units/units.ts"
+import { UnitAxis } from "../units/a_axis.ts";
 
 declare global {
   interface Window {
@@ -19,6 +20,7 @@ export async function animInit() {
   input.inputInit();
   await shd.shdInit();
   mtl.mtlInit();
+  units.unitAdd(new UnitAxis());
   units.unitAdd(new UnitTriangle());
   await units.unitsInit();
 }

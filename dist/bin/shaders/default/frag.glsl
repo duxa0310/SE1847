@@ -10,9 +10,14 @@ uniform vec4 KdTrans;
 uniform vec4 KsPh;
 
 uniform sampler2D Tex0;
+uniform bool IsTexture0;
 
 void main()
-{                                         
-  vec4 color = texture(Tex0, DrawTexCoord);
+{                                 
+  vec4 color;        
+  if (IsTexture0)
+    color = texture(Tex0, DrawTexCoord);
+  else
+    color = DrawColor;
   OutColor = vec4(color.xyz, KdTrans.w); 
 }

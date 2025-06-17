@@ -30,10 +30,15 @@ export class Material {
     window.gl.uniform4fv(window.gl.getUniformLocation(this.shd.program, "KdTrans"), new Float32Array([this.kd.x, this.kd.y, this.kd.z, this.trans]), 0, 0);
     window.gl.uniform4fv(window.gl.getUniformLocation(this.shd.program, "KsPh"), new Float32Array([this.ks.x, this.ks.y, this.ks.z, this.ph]), 0, 0);
 
-    for (let i: number = 0; i < this.textures.length; i++) {
+    let i: number = 0;
+    for (; i < this.textures.length; i++) {
       window.gl.activeTexture(window.gl.TEXTURE0 + i);
       window.gl.bindTexture(window.gl.TEXTURE_2D, this.textures[i].id);
       window.gl.uniform1i(window.gl.getUniformLocation(this.shd.program, "Tex" + i), 0);
+      window.gl.uniform1i(window.gl.getUniformLocation(this.shd.program, "IsTexture" + i), 1);
+    }
+    for (; i < 16; i++) {
+      window.gl.uniform1i(window.gl.getUniformLocation(this.shd.program, "IsTexture" + i), 0);
     }
   }
 }
