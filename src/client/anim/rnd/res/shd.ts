@@ -77,4 +77,5 @@ export function shdGetByName(name: string) {
 
 export async function shdInit() {
   await new Shader("default").init();
+  await new Shader("skybox").init();
 }

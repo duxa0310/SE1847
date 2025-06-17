@@ -3,9 +3,10 @@ import * as time from "./timer.ts"
 import * as input from "./input.ts"
 import * as shd from "./rnd/res/shd.ts";
 import * as mtl from "./rnd/res/mtl.ts";
-import { UnitTriangle } from "../units/u_triangle.ts"
 import * as units from "../units/units.ts"
+import { UnitSkybox } from "../units/u_skybox.ts";
 import { UnitAxis } from "../units/u_axis.ts";
+import { UnitTriangle } from "../units/u_triangle.ts"
 
 declare global {
   interface Window {
@@ -20,6 +21,7 @@ export async function animInit() {
   input.inputInit();
   await shd.shdInit();
   mtl.mtlInit();
+  units.unitAdd(new UnitSkybox());
   units.unitAdd(new UnitAxis());
   units.unitAdd(new UnitTriangle());
   await units.unitsInit();

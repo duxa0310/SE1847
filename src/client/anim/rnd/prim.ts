@@ -2,7 +2,8 @@ import { loadTextFromFile } from "../../utils.js";
 import { vec2, vec3, vec4 } from "../../mth/mth.ts"
 import * as mth from "../../mth/mth.ts"
 import { Material } from "./res/mtl.ts"
-import { getRenderContext } from "./rnd.ts";
+import { getRenderContext, RenderContext } from "./rnd.ts";
+import { getTimeContext, TimeContext } from "../timer.ts";
 
 export class Vertex {
   position: vec3;
@@ -85,6 +86,20 @@ export class Primitive {
 
   draw(matrW: mth.mat4) {
     this.mtl.apply();
+
+    const rc: RenderContext = getRenderContext();
+    window.gl.uniform3fv(window.gl.getUniformLocation(this.mtl.shd.program, "CamLoc"), new Float32Array([rc.camLoc.x, rc.camLoc.y, rc.camLoc.z]), 0, 0);
+    window.gl.uniform3fv(window.gl.getUniformLocation(this.mtl.shd.program, "CamDir"), new Float32Array([rc.camDir.x, rc.camDir.y, rc.camDir.z]), 0, 0);
+    window.gl.uniform3fv(window.gl.getUniformLocation(this.mtl.shd.program, "CamAt"), new Float32Array([rc.camAt.x, rc.camAt.y, rc.camAt.z]), 0, 0);
+    window.gl.uniform3fv(window.gl.getUniformLocation(this.mtl.shd.program, "CamUp"), new Float32Array([rc.camUp.x, rc.camUp.y, rc.camUp.z]), 0, 0);
+    window.gl.uniform3fv(window.gl.getUniformLocation(this.mtl.shd.program, "CamRight"), new Float32Array([rc.camRight.x, rc.camRight.y, rc.camRight.z]), 0, 0);
+    window.gl.uniform1f(window.gl.getUniformLocation(this.mtl.shd.program, "ProjSize"), rc.projSize);
+    window.gl.uniform1f(window.gl.getUniformLocation(this.mtl.shd.program, "ProjDist"), rc.projDist);
+    window.gl.uniform1f(window.gl.getUniformLocation(this.mtl.shd.program, "FrameW"), rc.frameW);
+    window.gl.uniform1f(window.gl.getUniformLocation(this.mtl.shd.program, "FrameH"), rc.frameH);
+
+    const tc: TimeContext = getTimeContext();
+    window.gl.uniform1f(window.gl.getUniformLocation(this.mtl.shd.program, "Time"), tc.localTime);
 
     window.gl.uniformMatrix4fv(window.gl.getUniformLocation(this.mtl.shd.program, "MatrW"), false,
       matrW.toArray());
