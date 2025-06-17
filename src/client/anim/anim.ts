@@ -9,6 +9,7 @@ import * as units from "../units/units.ts"
 import { UnitSkybox } from "../units/u_skybox.ts";
 import { UnitAxis } from "../units/u_axis.ts";
 import { UnitSquare } from "../units/u_square.ts";
+import { UnitGrid } from "../units/u_grid.ts";
 
 declare global {
   interface Window {
@@ -32,6 +33,7 @@ export async function animInit() {
   units.unitAdd(new UnitSkybox());
   units.unitAdd(new UnitAxis());
   units.unitAdd(new UnitSquare());
+  units.unitAdd(new UnitGrid());
   await units.unitsInit();
 }
 
