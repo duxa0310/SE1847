@@ -1,10 +1,12 @@
 import * as mth from "./mth/mth.ts";
 import * as anim from "./anim/anim.ts";
+import { getRenderContext } from "./anim/rnd/rnd.ts";
 
 let socket;
+let username;
 
 async function main() {
-  const username = localStorage.getItem('username');
+  username = localStorage.getItem('username');
   if (!username) {
     window.location.href = '/';
   }
@@ -17,6 +19,16 @@ async function main() {
       socket.emit('setUsername', username);
     });
 
+    socket.on("getServerData", (serverStr) => {
+      const serverData = JSON.parse(serverStr);
+      const map = new Map();
+      for (let property in serverData) {
+        if (property != username)
+          map.set(property, serverData[property]);
+      }
+      anim.setPlayersMap(map);
+    });
+
     socket.on("disconnect", () => {
       console.log("Disconnected:", socket.id);
     });
@@ -27,7 +39,19 @@ async function main() {
   window.gl = canvas.getContext("webgl2");
 
   await anim.animInit();
+  systemResponse();
+}
+
+function systemResponse() {
   anim.animRender();
+  socket.emit("updatePlayerData", JSON.stringify({
+    name: username,
+    data: {
+      online: true,
+      loc: getRenderContext().camLoc
+    }
+  }));
+  window.requestAnimationFrame(systemResponse);
 }
 
 main();

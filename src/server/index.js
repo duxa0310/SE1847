@@ -23,7 +23,7 @@ const io = new Server(server);
 
 /* Database handle */
 
-let clients = []; // Sockets list
+const clients = []; // Sockets list
 
 /* App handle */
 
@@ -36,6 +36,8 @@ app.get("/game", (req, res) => {
 });
 
 app.use(express.static("dist"));
+
+const playersMap = {};
 
 app.post("/auth", async (req, res) => {
   const username = req.body.username;
@@ -50,6 +52,11 @@ app.post("/auth", async (req, res) => {
       success: false,
       error: "Username must be at least 3 characters",
     });
+  } else if (playersMap[username] && playersMap[username].online == true) {
+    res.json({
+      success: false,
+      error: "You are already in the game!",
+    });
   } else {
     res.json({ success: true });
   }
@@ -61,11 +68,22 @@ io.on("connection", (socket) => {
 
   socket.on("setUsername", (username) => {
     socket.username = username;
-    console.log(`User ${username} connected to game`);
+    playersMap[socket.username] = {};
+    playersMap[socket.username].online = true;
+    console.log(`Player ${username} connected to game`);
+  });
+
+  socket.on("updatePlayerData", (playerStr) => {
+    const playerObj = JSON.parse(playerStr);
+    playersMap[playerObj.name] = playerObj.data;
+    for (let client of clients) {
+      client.emit("getServerData", JSON.stringify(playersMap));
+    }
   });
 
   socket.on("disconnect", () => {
     console.log(`Client disconnected with id: ${socket.id}`);
+    playersMap[socket.username].online = false;
     const index = clients.indexOf(socket);
     if (index > -1) {
       clients.splice(index, 1);
