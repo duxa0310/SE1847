@@ -43,6 +43,25 @@ function vertexArrayToFloatArray(vertices: Vertex[]): Float32Array {
   return new Float32Array(list);
 }
 
+export function primAutoNormals(vertices: Vertex[], indices: number[]) {
+  for (let i = 0; i < vertices.length; i++) {
+    vertices[i].normal = mth.vec3Set1(0);
+  }
+  for (let i = 0; i < indices.length; i += 3) {
+    const n0 = indices[i], n1 = indices[i + 1], n2 = indices[i + 2];
+    const p0 = vertices[n0].position, p1 = vertices[n1].position, p2 = vertices[n2].position;
+    const n = mth.vec3Normalize(
+      mth.vec3CrossVec3(mth.vec3SubVec3(p1, p0), mth.vec3SubVec3(p2, p0))
+    );
+    vertices[n0].normal = mth.vec3AddVec3(vertices[n0].normal, n);
+    vertices[n1].normal = mth.vec3AddVec3(vertices[n1].normal, n);
+    vertices[n2].normal = mth.vec3AddVec3(vertices[n2].normal, n);
+  }
+  for (let i = 0; i < vertices.length; i++) {
+    vertices[i].normal = mth.vec3Normalize(vertices[i].normal);
+  }
+}
+
 export class Primitive {
   glType: number;
   mtl: Material;
@@ -130,7 +149,7 @@ export async function primCreateFromOBJ(url: string, mtl: Material): Promise<Pri
   const isSpace: Function = function (c: string) { return c == ' ' || c == '\n' || c == '\t'; };
 
   let nV: number = 0, nF: number = 0, nI: number = 0;
-  let v: number = 0, f: number = 0, vn: number = 0;
+  let v: number = 0, f: number = 0, vn: number = 0, vt: number = 0;
 
   for (let i: number = 0; i < lines.length; i++) {
     const line: string = lines[i];
@@ -163,6 +182,12 @@ export async function primCreateFromOBJ(url: string, mtl: Material): Promise<Pri
       }
       const nums: number[] = line.substring(3).split(' ').map((c) => parseFloat(c));
       vertices[vn++].normal = mth.vec3Set(nums[0], nums[1], nums[2]);
+    } else if (line[0] == 'v' && line[1] == 't' && line[2] == ' ') {
+      if (vertices[vt] == undefined) {
+        vertices[vt] = new Vertex(new vec3(0, 0, 0), new vec2(0, 0), new vec3(0, 0, 0), new vec4(1, 1, 1, 1));
+      }
+      const nums: number[] = line.substring(3).split(' ').map((c) => parseFloat(c));
+      vertices[vt++].texCoord = mth.vec2Set(nums[0], nums[1]);
     } else if (line[0] == 'f' && line[1] == ' ') {
       let n: number = 0, c: number = 0, c0: number = 0, c1: number = 0;
       for (let i: number = 2; i < line.length; i++) {
@@ -188,5 +213,6 @@ export async function primCreateFromOBJ(url: string, mtl: Material): Promise<Pri
       }
     }
   }
+  primAutoNormals(vertices, indices);
   return new Primitive(window.gl.TRIANGLES, mtl, vertices, indices);
 }

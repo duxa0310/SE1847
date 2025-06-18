@@ -23,8 +23,8 @@ async function main() {
       const serverData = JSON.parse(serverStr);
       const map = new Map();
       for (let property in serverData) {
-        if (property != username)
-          map.set(property, serverData[property]);
+        //if (property != username)
+        map.set(property, serverData[property]);
       }
       anim.setPlayersMap(map);
     });
@@ -48,7 +48,8 @@ function systemResponse() {
     name: username,
     data: {
       online: true,
-      loc: getRenderContext().camLoc
+      loc: anim.getAnimContext().playerPos,
+      dir: anim.getAnimContext().playerDir
     }
   }));
   window.requestAnimationFrame(systemResponse);

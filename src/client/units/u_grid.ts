@@ -6,8 +6,9 @@ import * as shd from "../anim/rnd/res/shd.ts";
 import { Vertex } from "../anim/rnd/prim.ts";
 import { Unit } from "./units.js";
 import { mtlGetDefault } from "../anim/rnd/res/mtl.ts";
+import { getAnimContext } from "../anim/anim.ts";
 
-function getPointHeight(x: number, z: number): number {
+export function getPointHeight(x: number, z: number): number {
   return 8 * mth.noiseTurb2D(x / 30, z / 30, 7);
 }
 
@@ -67,25 +68,53 @@ function createChunkPrimitive(x0: number, y0: number, z0: number, w: number, h: 
 
 export class UnitGrid extends Unit {
   prim!: prim.Primitive;
+  lands: prim.Primitive[] = [];
+  mtl!: mtl.Material;
+  flagFirst: boolean = true;
+  locX: number = 0;
+  locZ: number = 0;
 
   constructor() {
     super("Grid");
+    const loc: mth.vec3 = getAnimContext().playerPos;
+    this.locX = (loc.x / 32) >> 0;
+    this.locZ = (loc.z / 32) >> 0;
   }
 
   async init() {
     const x0: number = 0, y0: number = 0, z0: number = 0;
-    const w: number = 18, h: number = 18;
+    const w: number = 32, h: number = 32;
     const tessW: number = 32, tessH: number = 32;
 
     const mtlLand: mtl.Material = new mtl.Material("Land material", mth.vec3Set1(1), mth.vec3Set1(0.8), mth.vec3Set1(0), 30, 1, shd.shdGetDefault());
     mtlLand.textures[0] = tex.texCreateImage("Land texture", "bin/textures/land_grass.jpg", 1, 1);
-    this.prim = createChunkPrimitive(x0, y0, z0, w, h, tessW, tessH);
-    this.prim.mtl = mtlLand;
+    this.mtl = mtlLand;
   }
 
-  response() { }
+  response() {
+    const loc: mth.vec3 = getAnimContext().playerPos;
+    const x0: number = (loc.x / 32) >> 0, z0: number = (loc.z / 32) >> 0;
+
+    if (x0 != this.locX || z0 != this.locZ || this.flagFirst) {
+      this.flagFirst = false;
+      this.lands = [];
+      for (let i: number = -3; i < 4; i++) {
+        for (let j: number = -3; j < 4; j++) {
+          const prim: prim.Primitive = createChunkPrimitive(x0 * 32 + i * 32, 0, z0 * 32 + j * 32, 32, 32,
+            (32 / (Math.abs(j) + 1)) >> 0, (32 / (Math.abs(i) + 1)) >> 0);
+          prim.mtl = this.mtl;
+          this.lands.push(prim);
+        }
+      }
+      console.log(x0, z0);
+      this.locX = x0;
+      this.locZ = z0;
+    }
+  }
 
   render() {
-    this.prim.draw(mth.mat4Identity());
+    for (let i: number = 0; i < this.lands.length; i++) {
+      this.lands[i].draw(mth.mat4Identity());
+    }
   }
 }

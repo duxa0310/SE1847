@@ -1,4 +1,6 @@
 import * as mth from "../mth/mth.ts";
+import { getPointHeight } from "../units/u_grid.ts";
+import { AnimContext, getAnimContext } from "./anim.ts";
 import { getRenderContext, RenderContext, rndCamSet } from "./rnd/rnd";
 
 export class InputContext {
@@ -143,6 +145,25 @@ export function inputInit() {
   window.addEventListener('wheel', (e) => onMouseWheel(e));
   window.addEventListener('mouseup', (e) => onMouseUp(e));
   window.addEventListener('mousedown', (e) => onMouseDown(e));
+}
+
+export function inputResponse() {
+  const rc: RenderContext = getRenderContext();
+  const ac: AnimContext = getAnimContext();
+  let deltaPos: mth.vec3 = mth.vec3MulNum(ac.playerDir, 0.102 * (1 + 3.0 * Number(input.shiftKey)));
+  if (input.keys["w".charCodeAt(0)] || input.keys["s".charCodeAt(0)]) {
+    if (input.keys["s".charCodeAt(0)]) deltaPos = mth.vec3Neg(deltaPos);
+    ac.playerPos = mth.vec3AddVec3(ac.playerPos, deltaPos);
+    const newY: number = getPointHeight(ac.playerPos.x, ac.playerPos.z);
+    ac.playerPos.y = newY;
+    //const deltaY = newY - rc.camLoc.y;
+    rndCamSet(mth.vec3AddVec3(rc.camLoc, deltaPos), mth.vec3SubVec3(ac.playerPos, mth.vec3Set(0, newY - 18, 0)), mth.vec3Set(0, 1, 0));
+  }
+  let deltaAngle: number = 3.0;
+  if (input.keys["a".charCodeAt(0)] || input.keys["d".charCodeAt(0)]) {
+    if (input.keys["d".charCodeAt(0)]) deltaAngle *= -1;
+    ac.playerDir = mth.vec3MulMat4(ac.playerDir, mth.mat4RotateY(deltaAngle));
+  }
 }
 
 export function getInputContext(): InputContext {
