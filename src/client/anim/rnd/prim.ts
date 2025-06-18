@@ -143,9 +143,8 @@ export function primCreate(glType: number, mtl: Material, vertices: Vertex[], in
   return new Primitive(glType, mtl, vertices, indices);
 }
 
-export async function primCreateFromOBJ(url: string, mtl: Material): Promise<Primitive> {
-  const modelSrc: string = await loadTextFromFile(url);
-  const lines: string[] = modelSrc.split("\n");
+export function primCreateFromOBJString(primSrc: string, mtl: Material): Primitive {
+  const lines: string[] = primSrc.split("\n");
   const isSpace: Function = function (c: string) { return c == ' ' || c == '\n' || c == '\t'; };
 
   let nV: number = 0, nF: number = 0, nI: number = 0;
@@ -215,4 +214,9 @@ export async function primCreateFromOBJ(url: string, mtl: Material): Promise<Pri
   }
   primAutoNormals(vertices, indices);
   return new Primitive(window.gl.TRIANGLES, mtl, vertices, indices);
+}
+
+export async function primCreateFromOBJ(url: string, mtl: Material): Promise<Primitive> {
+  const modelSrc: string = await loadTextFromFile(url);
+  return primCreateFromOBJString(modelSrc, mtl);
 }
