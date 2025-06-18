@@ -9,7 +9,7 @@ import { mtlGetDefault } from "../anim/rnd/res/mtl.ts";
 import { getAnimContext } from "../anim/anim.ts";
 
 export function getPointHeight(x: number, z: number): number {
-  return 8 * mth.noiseTurb2D(x / 30, z / 30, 7);
+  return 8 * mth.noiseTurb2D(x / 100, z / 100, 7);
 }
 
 function createChunkPrimitive(x0: number, y0: number, z0: number, w: number, h: number, tessW: number, tessH: number): prim.Primitive {

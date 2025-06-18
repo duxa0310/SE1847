@@ -1,4 +1,5 @@
 import * as mth from "../../mth/mth.ts"
+import { AnimContext, getAnimContext } from "../anim.ts";
 
 let projSize: number;
 let projDist: number;
@@ -101,7 +102,9 @@ export function rndInit() {
   projDist = projSize;
   farClip = 1847;
 
-  rndCamSet(mth.vec3Set1(18), mth.vec3Set1(0), mth.vec3Set(0, 1, 0));
+  const ac: AnimContext = getAnimContext();
+
+  rndCamSet(mth.vec3Set1(18), mth.vec3AddVec3(ac.playerPos, mth.vec3Set(0, 0, 0)), mth.vec3Set(0, 1, 0));
   rndProjSet(document.documentElement.clientWidth, document.documentElement.clientHeight);
 }
 

@@ -19,6 +19,7 @@ export class Texture {
 
 export function texCreateImage(name: string, url: string, w: number, h: number): Texture {
   const tex: Texture = new Texture(name, w, h, window.gl.TEXTURE_2D, window.gl.RGBA, true);
+  console.log(`Loading texture: ${name} ${w} * ${h}`);
 
   tex.id = window.gl.createTexture()
   tex.glType = window.gl.TEXTURE_2D;
@@ -90,6 +91,38 @@ export function texCreateCubeMap(url: string, ext: string): Texture {
   window.gl.texParameteri(window.gl.TEXTURE_CUBE_MAP, window.gl.TEXTURE_WRAP_S, window.gl.CLAMP_TO_EDGE);
   window.gl.texParameteri(window.gl.TEXTURE_CUBE_MAP, window.gl.TEXTURE_WRAP_T, window.gl.CLAMP_TO_EDGE);
   window.gl.texParameteri(window.gl.TEXTURE_CUBE_MAP, window.gl.TEXTURE_WRAP_R, window.gl.CLAMP_TO_EDGE);
+
+  return tex;
+}
+
+export function texCreateBinary(name: string, w: number, h: number, c: number, bytes: Uint8Array): Texture {
+  const tex: Texture = new Texture(name, w, h, window.gl.TEXTURE_2D, window.gl.RGBA, true);
+  console.log(`Loading texture: ${name} ${w} * ${h}`);
+
+  tex.id = window.gl.createTexture();
+  tex.glType = window.gl.TEXTURE_2D;
+  window.gl.bindTexture(tex.glType, tex.id);
+
+  let mips: number = Math.log(w > h ? w : h) / Math.log(2);
+  mips = mips < 1 ? 1 : mips;
+
+  window.gl.texStorage2D(window.gl.TEXTURE_2D, mips,
+    c == 4 ? window.gl.RGBA8 : c == 3 ? window.gl.RGB8 : window.gl.R8, w, h);
+
+  if (bytes != null) {
+    window.gl.bindTexture(window.gl.TEXTURE_2D, tex.id);
+    window.gl.pixelStorei(window.gl.UNPACK_ALIGNMENT, 1);
+    window.gl.texSubImage2D(window.gl.TEXTURE_2D, 0, 0, 0, w, h,
+      c == 4 ? window.gl.RGBA : c == 3 ? window.gl.RGB : window.gl.LUMINANCE, window.gl.UNSIGNED_BYTE, bytes);
+  }
+
+  window.gl.generateMipmap(window.gl.TEXTURE_2D);
+  window.gl.texParameteri(window.gl.TEXTURE_2D, window.gl.TEXTURE_MIN_FILTER, window.gl.LINEAR_MIPMAP_LINEAR);
+  window.gl.texParameteri(window.gl.TEXTURE_2D, window.gl.TEXTURE_MAG_FILTER, window.gl.LINEAR);
+  window.gl.texParameteri(window.gl.TEXTURE_2D, window.gl.TEXTURE_WRAP_S, window.gl.REPEAT);
+  window.gl.texParameteri(window.gl.TEXTURE_2D, window.gl.TEXTURE_WRAP_T, window.gl.REPEAT);
+
+  tex.name = name;
 
   return tex;
 }

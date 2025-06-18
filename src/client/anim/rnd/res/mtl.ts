@@ -32,16 +32,19 @@ export class Material {
 
     let i: number = 0;
     for (; i < this.textures.length; i++) {
-      window.gl.activeTexture(window.gl.TEXTURE0 + i);
-      window.gl.bindTexture(this.textures[i].glType, this.textures[i].id);
-      window.gl.uniform1i(window.gl.getUniformLocation(this.shd.program, "Tex" + i), 0);
-      window.gl.uniform1i(window.gl.getUniformLocation(this.shd.program, "IsTexture" + i), 1);
+      if (this.textures[i] != undefined) {
+        window.gl.activeTexture(window.gl.TEXTURE0 + i);
+        window.gl.bindTexture(this.textures[i].glType, this.textures[i].id);
+        window.gl.uniform1i(window.gl.getUniformLocation(this.shd.program, "Tex" + i), 0);
+        window.gl.uniform1i(window.gl.getUniformLocation(this.shd.program, "IsTexture" + i), 1);
+      }
     }
     for (; i < 16; i++) {
       window.gl.uniform1i(window.gl.getUniformLocation(this.shd.program, "IsTexture" + i), 0);
     }
   }
 }
+
 
 export function mtlCreateDefaultShader(name: string, ka: vec3, kd: vec3, ks: vec3, ph: number, trans: number) {
   return new Material(name, ka, kd, ks, ph, trans, shdGetDefault());

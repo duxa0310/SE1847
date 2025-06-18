@@ -8,6 +8,7 @@ import * as mtl from "./rnd/res/mtl.ts";
 import * as units from "../units/units.ts"
 import { UnitSkybox } from "../units/u_skybox.ts";
 import { UnitAxis } from "../units/u_axis.ts";
+import { UnitModel } from "../units/u_model.ts";
 import { getPointHeight, UnitGrid } from "../units/u_grid.ts";
 import { texCreateImage } from "./rnd/res/tex.ts";
 
@@ -50,8 +51,8 @@ export async function animInit() {
   mtl.mtlInit();
   units.unitAdd(new UnitSkybox());
   units.unitAdd(new UnitAxis());
-  //units.unitAdd(new UnitSquare());
   units.unitAdd(new UnitGrid());
+  units.unitAdd(new UnitModel());
   await units.unitsInit();
 
   const mtlPlayer: mtl.Material = new mtl.Material("Player material", mth.vec3Set1(1), mth.vec3Set1(1), mth.vec3Set1(1), 30, 1,
@@ -61,9 +62,17 @@ export async function animInit() {
 }
 
 function animDrawPlayer(loc: mth.vec3, dir: mth.vec3) {
+  const landNormal: mth.vec3 = mth.vec3Normalize(mth.vec3CrossVec3(
+    mth.vec3SubVec3(mth.vec3Set(loc.x, getPointHeight(loc.x, loc.z + 0.001), loc.z + 0.001), loc),
+    mth.vec3SubVec3(mth.vec3Set(loc.x + 0.001, getPointHeight(loc.x + 0.001, loc.z), loc.z), loc),
+  ));
+  const normCrossUp: mth.vec3 = mth.vec3Normalize(mth.vec3CrossVec3(landNormal, mth.vec3Set(0, 1, 0)));
   playerPrim.draw(mth.mat4MulMat4(
-    mth.mat4RotateY(mth.radiansToDegrees(Math.atan2(dir.x, dir.z))),
-    mth.mat4Translate(mth.vec3AddVec3(loc, mth.vec3Set(0, 1.8, 0)))
+    mth.mat4MulMat4(
+      mth.mat4RotateY(mth.radiansToDegrees(Math.atan2(dir.x, dir.z))),
+      mth.mat4Rotate(mth.radiansToDegrees(-Math.acos(mth.vec3DotVec3(landNormal, mth.vec3Set(0, 1, 0)))), mth.vec3Normalize(normCrossUp))
+    ),
+    mth.mat4Translate(mth.vec3AddVec3(loc, mth.vec3Set(0, 1.5, 0)))
   ));
 }
 

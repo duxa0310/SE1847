@@ -150,13 +150,12 @@ export function inputInit() {
 export function inputResponse() {
   const rc: RenderContext = getRenderContext();
   const ac: AnimContext = getAnimContext();
-  let deltaPos: mth.vec3 = mth.vec3MulNum(ac.playerDir, 0.102 * (1 + 3.0 * Number(input.shiftKey)));
+  let deltaPos: mth.vec3 = mth.vec3MulNum(ac.playerDir, 0.047 * (1 + Number(input.shiftKey)));
   if (input.keys["w".charCodeAt(0)] || input.keys["s".charCodeAt(0)]) {
     if (input.keys["s".charCodeAt(0)]) deltaPos = mth.vec3Neg(deltaPos);
     ac.playerPos = mth.vec3AddVec3(ac.playerPos, deltaPos);
     const newY: number = getPointHeight(ac.playerPos.x, ac.playerPos.z);
     ac.playerPos.y = newY;
-    //const deltaY = newY - rc.camLoc.y;
     rndCamSet(mth.vec3AddVec3(rc.camLoc, deltaPos), mth.vec3SubVec3(ac.playerPos, mth.vec3Set(0, newY - 18, 0)), mth.vec3Set(0, 1, 0));
   }
   let deltaAngle: number = 3.0;
