@@ -21,7 +21,7 @@ vec3 Shade( vec3 Pos, vec3 N, vec3 Kd, vec3 Ks, float Ph, vec3 L, vec3 LC ) {
   vec3 color = vec3(0), V = normalize(Pos - CamLoc);
  
   N = faceforward(N, V, N);
-  color += max(0.1, dot(N, L)) * Kd * LC;
+  color += 0.8 * max(0.1, dot(N, L) * dot(N, L)) * Kd * LC;
 
   vec3 R = reflect(V, N);
   color += pow(max(0.1, dot(R, L)), Ph) * Ks * LC;
