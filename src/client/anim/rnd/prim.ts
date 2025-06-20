@@ -205,8 +205,107 @@ export function drawPrimSaveBB(prim: Primitive) {
 }
 
 export function collidePrim(prim1: Primitive, prim2: Primitive): boolean {
+  const x_axis: mth.vec3 = mth.vec3Normalize(mth.vec3SubVec3(prim1.bb[3], prim1.bb[0]));
+  const z_axis: mth.vec3 = mth.vec3Normalize(mth.vec3SubVec3(prim1.bb[1], prim1.bb[0]));
+  let collision_x: boolean = false;
+  let collision_z: boolean = false;
 
-  return false;
+  for (let i = 0; i < 8; i++) {
+    const dotx: number = mth.vec3DotVec3(x_axis, prim2.bb[i]);
+    const cosx: number = dotx / (mth.vec3Len(x_axis) * mth.vec3Len(prim2.bb[i]));
+    let projx: mth.vec3 = mth.vec3MulNum(x_axis, dotx);
+    let lenx: number = mth.vec3Len(projx);
+    if (lenx < mth.vec3Len(x_axis)) {
+      collision_x = true;
+    }
+
+    const dotz = mth.vec3DotVec3(z_axis, mth.vec3Normalize(prim2.bb[i]));
+    const cosz = dotz / (mth.vec3Len(z_axis) * mth.vec3Len(prim2.bb[i]));
+    let projz: mth.vec3 = mth.vec3MulNum(z_axis, dotz);
+    let lenz: number = mth.vec3Len(projz);
+    if (lenz < mth.vec3Len(z_axis)) {
+      collision_z = true;
+    }
+  }
+  return collision_x && collision_z;
+}
+
+/*************************
+           4--------7
+          /'       /|
+         / '      / |
+        0--------3  |
+        |  '     |  |
+        |  5 - - |- 6
+        | '      | /
+        |'       |/
+        1--------2
+**************************/
+
+export class OBB {
+  vertexBounds: mth.vec3[];
+
+  constructor(vertices: mth.vec3[]) {
+    if (vertices.length !== 8) throw new Error("OBB must have exactly 8 vertices.");
+    this.vertexBounds = vertices;
+  }
+}
+
+function obbGetFaceAxis(box: OBB): mth.vec3[] {
+  const axis: mth.vec3[] = [];
+  const [v0, v1, v2, v3, v4, v5, v6, v7] = box.vertexBounds;
+
+  const right: mth.vec3 = mth.vec3Normalize(mth.vec3SubVec3(v1, v0));
+  const up: mth.vec3 = mth.vec3Normalize(mth.vec3SubVec3(v3, v0));
+  const forward: mth.vec3 = mth.vec3Normalize(mth.vec3SubVec3(v4, v0));
+
+  axis.push(right, up, forward);
+  return axis;
+}
+
+export function obbCollision(box1: OBB, box2: OBB): boolean {
+  const allAxis: mth.vec3[] = [];
+  const box1Axis: mth.vec3[] = obbGetFaceAxis(box1);
+  const box2Axis: mth.vec3[] = obbGetFaceAxis(box2);
+
+  /* Collect all axis for check */
+  allAxis.push(...box1Axis, ...box2Axis);
+  /*for (let a1 of box1Axis) {
+    for (let a2 of box2Axis) {
+      const crossAxis: mth.vec3 = mth.vec3CrossVec3(a1, a2);
+      if (mth.vec3Len(crossAxis) > 0.000001) {
+        allAxis.push(mth.vec3Normalize(crossAxis));
+      }
+    }
+  } */
+
+  /* Check each axis for overlap */
+  for (let axis of allAxis) {
+
+    /* Projection of box1 vertices on current axis */
+    let min1: number = Infinity, max1: number = -Infinity;
+    for (const v of box1.vertexBounds) {
+      const proj: number = mth.vec3DotVec3(v, axis);
+      min1 = Math.min(min1, proj);
+      max1 = Math.max(max1, proj);
+    }
+
+    /* Projection of box2 vertices on current axis */
+    let min2: number = Infinity, max2: number = -Infinity;
+    for (const v of box2.vertexBounds) {
+      const proj: number = mth.vec3DotVec3(v, axis);
+      min2 = Math.min(min2, proj);
+      max2 = Math.max(max2, proj);
+    }
+
+    /* Exit if projections do not intersect (no collision) */
+    if (max1 < min2 || max2 < min1) {
+      return false;
+    }
+  }
+
+  /* Collision on all axis */
+  return true;
 }
 
 export function changePrimTrans(prim: Primitive, trans: mth.mat4) {
