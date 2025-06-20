@@ -1,11 +1,11 @@
 /** SE1847: Primitive, 20.06.2025 */
+import * as mth from "../../mth/mth.ts"
+import * as col from "../../mth/collision.ts"
+import * as mtl from "./res/mtl.ts"
 import { loadTextFromFile } from "../../utils.js";
 import { vec2, vec3, vec4 } from "../../mth/mth.ts"
-import * as mth from "../../mth/mth.ts"
-import * as mtl from "./res/mtl.ts"
 import { getRenderContext, RenderContext } from "./rnd.ts";
 import { getTimeContext, TimeContext } from "../timer.ts";
-import { shdGetByName } from "./res/shd.ts";
 
 export class Vertex {
   position: vec3;
@@ -45,274 +45,6 @@ function vertexArrayToFloatArray(vertices: Vertex[]): Float32Array {
   return new Float32Array(list);
 }
 
-export function primAutoNormals(vertices: Vertex[], indices: number[]) {
-  for (let i = 0; i < vertices.length; i++) {
-    vertices[i].normal = mth.vec3Set1(0);
-  }
-  for (let i = 0; i < indices.length; i += 3) {
-    const n0 = indices[i], n1 = indices[i + 1], n2 = indices[i + 2];
-    const p0 = vertices[n0].position, p1 = vertices[n1].position, p2 = vertices[n2].position;
-    const n = mth.vec3Normalize(
-      mth.vec3CrossVec3(mth.vec3SubVec3(p1, p0), mth.vec3SubVec3(p2, p0))
-    );
-    vertices[n0].normal = mth.vec3AddVec3(vertices[n0].normal, n);
-    vertices[n1].normal = mth.vec3AddVec3(vertices[n1].normal, n);
-    vertices[n2].normal = mth.vec3AddVec3(vertices[n2].normal, n);
-  }
-  for (let i = 0; i < vertices.length; i++) {
-    vertices[i].normal = mth.vec3Normalize(vertices[i].normal);
-  }
-}
-
-export function evalBB(vertices: Vertex[]): mth.vec3[] {
-  let minbb: mth.vec3, maxbb: mth.vec3;
-  if (vertices == undefined || vertices.length == 0) {
-    return [mth.vec3Set1(0), mth.vec3Set1(1)];
-  }
-  else {
-    minbb = structuredClone(vertices[0].position);
-    maxbb = structuredClone(vertices[0].position);
-    for (let i = 1; i < vertices.length; i++) {
-      if (minbb.x > vertices[i].position.x)
-        minbb.x = vertices[i].position.x;
-      else if (maxbb.x < vertices[i].position.x)
-        maxbb.x = vertices[i].position.x;
-
-      if (minbb.y > vertices[i].position.y)
-        minbb.y = vertices[i].position.y;
-      else if (maxbb.y < vertices[i].position.y)
-        maxbb.y = vertices[i].position.y;
-
-      if (minbb.z > vertices[i].position.z)
-        minbb.z = vertices[i].position.z;
-      else if (maxbb.z < vertices[i].position.z)
-        maxbb.z = vertices[i].position.z;
-    }
-  }
-
-  let bb: mth.vec3[] = [];
-
-  bb[0] = minbb;
-  bb[1] = mth.vec3Set(minbb.x, minbb.y, maxbb.z);
-  bb[2] = mth.vec3Set(maxbb.x, minbb.y, maxbb.z);
-  bb[3] = mth.vec3Set(maxbb.x, minbb.y, minbb.z);
-
-  bb[4] = mth.vec3Set(minbb.x, maxbb.y, minbb.z);
-  bb[5] = mth.vec3Set(minbb.x, maxbb.y, maxbb.z);
-  bb[6] = maxbb;
-  bb[7] = mth.vec3Set(maxbb.x, maxbb.y, minbb.z);
-
-  return bb;
-}
-
-export function recalcPrimBB(prim: Primitive) {
-  for (let i = 0; i < 8; i++) {
-    prim.bb[i] = mth.pointTransform(prim.savebb[i], prim.trans);
-  }
-}
-
-export function drawPrimBBMatr(prim: Primitive) {
-  let vertices: Vertex[] = [
-    new Vertex(prim.bb[0], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(prim.bb[1], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(prim.bb[2], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(prim.bb[3], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-
-    new Vertex(prim.bb[4], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(prim.bb[5], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(prim.bb[6], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(prim.bb[7], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1))];
-  let indices: number[] = [
-    0, 1,
-    1, 2,
-    2, 3,
-    3, 0,
-
-    4, 5,
-    5, 6,
-    6, 7,
-    7, 4,
-
-    0, 4,
-    1, 5,
-    2, 6,
-    3, 7];
-
-  let boundbox: Primitive = primCreate(window.gl.LINES, mtl.mtlGetDefault(), vertices, indices);
-  boundbox.draw(prim.trans);
-}
-
-export function drawPrimBB(prim: Primitive) {
-  let vertices: Vertex[] = [
-    new Vertex(prim.bb[0], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
-    new Vertex(prim.bb[1], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
-    new Vertex(prim.bb[2], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
-    new Vertex(prim.bb[3], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
-
-    new Vertex(prim.bb[4], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
-    new Vertex(prim.bb[5], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
-    new Vertex(prim.bb[6], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
-    new Vertex(prim.bb[7], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1))];
-  let indices: number[] = [
-    0, 1,
-    1, 2,
-    2, 3,
-    3, 0,
-
-    4, 5,
-    5, 6,
-    6, 7,
-    7, 4,
-
-    0, 4,
-    1, 5,
-    2, 6,
-    3, 7];
-
-  let boundbox: Primitive = primCreate(window.gl.LINES, mtl.mtlGetDefault(), vertices, indices);
-  boundbox.draw(mth.mat4Identity());
-}
-
-export function drawPrimSaveBB(prim: Primitive) {
-  let vertices: Vertex[] = [
-    new Vertex(mth.vec3Set(prim.savebb[0].x, prim.savebb[0].y, prim.savebb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(mth.vec3Set(prim.savebb[0].x, prim.savebb[6].y, prim.savebb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(mth.vec3Set(prim.savebb[0].x, prim.savebb[6].y, prim.savebb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(mth.vec3Set(prim.savebb[0].x, prim.savebb[0].y, prim.savebb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-
-    new Vertex(mth.vec3Set(prim.savebb[6].x, prim.savebb[0].y, prim.savebb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(mth.vec3Set(prim.savebb[6].x, prim.savebb[6].y, prim.savebb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(mth.vec3Set(prim.savebb[6].x, prim.savebb[6].y, prim.savebb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new Vertex(mth.vec3Set(prim.savebb[6].x, prim.savebb[0].y, prim.savebb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1))];
-  let indices: number[] = [
-    0, 1,
-    1, 2,
-    2, 3,
-    3, 0,
-
-    4, 5,
-    5, 6,
-    6, 7,
-    7, 4,
-
-    0, 4,
-    1, 5,
-    2, 6,
-    3, 7];
-
-  let boundbox: Primitive = primCreate(window.gl.LINES, mtl.mtlGetDefault(), vertices, indices);
-  boundbox.draw(mth.mat4Identity());
-}
-
-export function collidePrim(prim1: Primitive, prim2: Primitive): boolean {
-  const x_axis: mth.vec3 = mth.vec3Normalize(mth.vec3SubVec3(prim1.bb[3], prim1.bb[0]));
-  const z_axis: mth.vec3 = mth.vec3Normalize(mth.vec3SubVec3(prim1.bb[1], prim1.bb[0]));
-  let collision_x: boolean = false;
-  let collision_z: boolean = false;
-
-  for (let i = 0; i < 8; i++) {
-    const dotx: number = mth.vec3DotVec3(x_axis, prim2.bb[i]);
-    const cosx: number = dotx / (mth.vec3Len(x_axis) * mth.vec3Len(prim2.bb[i]));
-    let projx: mth.vec3 = mth.vec3MulNum(x_axis, dotx);
-    let lenx: number = mth.vec3Len(projx);
-    if (lenx < mth.vec3Len(x_axis)) {
-      collision_x = true;
-    }
-
-    const dotz = mth.vec3DotVec3(z_axis, mth.vec3Normalize(prim2.bb[i]));
-    const cosz = dotz / (mth.vec3Len(z_axis) * mth.vec3Len(prim2.bb[i]));
-    let projz: mth.vec3 = mth.vec3MulNum(z_axis, dotz);
-    let lenz: number = mth.vec3Len(projz);
-    if (lenz < mth.vec3Len(z_axis)) {
-      collision_z = true;
-    }
-  }
-  return collision_x && collision_z;
-}
-
-/*************************
-           4--------7
-          /'       /|
-         / '      / |
-        0--------3  |
-        |  '     |  |
-        |  5 - - |- 6
-        | '      | /
-        |'       |/
-        1--------2
-**************************/
-
-export class OBB {
-  vertexBounds: mth.vec3[];
-
-  constructor(vertices: mth.vec3[]) {
-    if (vertices.length !== 8) throw new Error("OBB must have exactly 8 vertices.");
-    this.vertexBounds = vertices;
-  }
-}
-
-function obbGetFaceAxis(box: OBB): mth.vec3[] {
-  const axis: mth.vec3[] = [];
-  const [v0, v1, v2, v3, v4, v5, v6, v7] = box.vertexBounds;
-
-  const right: mth.vec3 = mth.vec3Normalize(mth.vec3SubVec3(v1, v0));
-  const up: mth.vec3 = mth.vec3Normalize(mth.vec3SubVec3(v3, v0));
-  const forward: mth.vec3 = mth.vec3Normalize(mth.vec3SubVec3(v4, v0));
-
-  axis.push(right, up, forward);
-  return axis;
-}
-
-export function obbCollision(box1: OBB, box2: OBB): boolean {
-  const allAxis: mth.vec3[] = [];
-  const box1Axis: mth.vec3[] = obbGetFaceAxis(box1);
-  const box2Axis: mth.vec3[] = obbGetFaceAxis(box2);
-
-  /* Collect all axis for check */
-  allAxis.push(...box1Axis, ...box2Axis);
-  /*for (let a1 of box1Axis) {
-    for (let a2 of box2Axis) {
-      const crossAxis: mth.vec3 = mth.vec3CrossVec3(a1, a2);
-      if (mth.vec3Len(crossAxis) > 0.000001) {
-        allAxis.push(mth.vec3Normalize(crossAxis));
-      }
-    }
-  } */
-
-  /* Check each axis for overlap */
-  for (let axis of allAxis) {
-
-    /* Projection of box1 vertices on current axis */
-    let min1: number = Infinity, max1: number = -Infinity;
-    for (const v of box1.vertexBounds) {
-      const proj: number = mth.vec3DotVec3(v, axis);
-      min1 = Math.min(min1, proj);
-      max1 = Math.max(max1, proj);
-    }
-
-    /* Projection of box2 vertices on current axis */
-    let min2: number = Infinity, max2: number = -Infinity;
-    for (const v of box2.vertexBounds) {
-      const proj: number = mth.vec3DotVec3(v, axis);
-      min2 = Math.min(min2, proj);
-      max2 = Math.max(max2, proj);
-    }
-
-    /* Exit if projections do not intersect (no collision) */
-    if (max1 < min2 || max2 < min1) {
-      return false;
-    }
-  }
-
-  /* Collision on all axis */
-  return true;
-}
-
-export function changePrimTrans(prim: Primitive, trans: mth.mat4) {
-  prim.trans = trans;
-  recalcPrimBB(prim);
-}
-
 export class Primitive {
   glType: number;
   mtl: mtl.Material;
@@ -321,17 +53,16 @@ export class Primitive {
   iBuf!: WebGLBuffer;
   numOfElements: number;
   trans!: mth.mat4;
-  savebb!: mth.vec3[];
-  bb: mth.vec3[];
+  saveBB!: col.OBB;
+  BB: col.OBB;
 
   constructor(glType: number, mtl: mtl.Material, vertices: Vertex[], indices: number[]) {
     this.glType = glType;
     this.mtl = mtl;
-    this.trans = mth.mat4Identity()
+    this.trans = mth.mat4Identity();
 
-    this.savebb = evalBB(vertices);
-    this.bb = structuredClone(this.savebb);
-    //console.log(`Creating primitive. minbb: (${this.bb0.x}, ${this.bb0.y}, ${this.bb0.z}), maxbb: (${this.bb6.x}, ${this.bb6.y}, ${this.bb6.z})`);
+    this.saveBB = col.obbCreateFromAABB(col.evalAABB(vertices.map((v) => v.position)));
+    this.BB = structuredClone(this.saveBB);
 
     if (vertices.length > 0) {
       this.vBuf = window.gl.createBuffer();
@@ -480,4 +211,42 @@ export function primCreateFromOBJString(primSrc: string, mtl: mtl.Material): Pri
 export async function primCreateFromOBJ(url: string, mtl: mtl.Material): Promise<Primitive> {
   const modelSrc: string = await loadTextFromFile(url);
   return primCreateFromOBJString(modelSrc, mtl);
+}
+
+export function primAutoNormals(vertices: Vertex[], indices: number[]) {
+  for (let i = 0; i < vertices.length; i++) {
+    vertices[i].normal = mth.vec3Set1(0);
+  }
+  for (let i = 0; i < indices.length; i += 3) {
+    const n0 = indices[i], n1 = indices[i + 1], n2 = indices[i + 2];
+    const p0 = vertices[n0].position, p1 = vertices[n1].position, p2 = vertices[n2].position;
+    const n = mth.vec3Normalize(
+      mth.vec3CrossVec3(mth.vec3SubVec3(p1, p0), mth.vec3SubVec3(p2, p0))
+    );
+    vertices[n0].normal = mth.vec3AddVec3(vertices[n0].normal, n);
+    vertices[n1].normal = mth.vec3AddVec3(vertices[n1].normal, n);
+    vertices[n2].normal = mth.vec3AddVec3(vertices[n2].normal, n);
+  }
+  for (let i = 0; i < vertices.length; i++) {
+    vertices[i].normal = mth.vec3Normalize(vertices[i].normal);
+  }
+}
+
+export function primDrawOBB(prim: Primitive) {
+  const vertices: Vertex[] = prim.BB.vertexBounds
+    .map((pos) => new Vertex(pos, mth.vec2Set1(0), mth.vec3Set(0, 1, 0), mth.vec4Set1(1)));
+  const indices: number[] = [0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7];
+
+  primCreate(window.gl.LINES, mtl.mtlGetDefault(), vertices, indices).draw(mth.mat4Identity());
+}
+
+export function primRecalcOBB(prim: Primitive) {
+  for (let i = 0; i < 8; i++) {
+    prim.BB.vertexBounds[i] = mth.pointTransform(prim.saveBB.vertexBounds[i], prim.trans);
+  }
+}
+
+export function primSetMatrTrans(prim: Primitive, trans: mth.mat4) {
+  prim.trans = trans;
+  primRecalcOBB(prim);
 }

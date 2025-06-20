@@ -1,6 +1,5 @@
 import * as mth from "./mth/mth.ts";
 import * as anim from "./anim/anim.ts";
-import { getRenderContext } from "./anim/rnd/rnd.ts";
 
 let socket;
 let username;

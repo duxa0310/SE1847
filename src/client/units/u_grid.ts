@@ -66,7 +66,7 @@ function createChunkPrimitive(x0: number, y0: number, z0: number, w: number, h: 
   return prim.primCreate(window.gl.TRIANGLE_STRIP, mtlGetDefault(), verticesList, indices);
 }
 
-const maxChunksRenderCount: number = 32;
+const maxChunksRenderCount: number = 16;
 const chunkSize: number = 16;
 const tessCount: number = 16;
 
