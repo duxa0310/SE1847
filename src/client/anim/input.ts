@@ -2,6 +2,7 @@ import * as mth from "../mth/mth.ts";
 import { getPointHeight } from "../units/u_grid.ts";
 import { AnimContext, getAnimContext } from "./anim.ts";
 import { getRenderContext, RenderContext, rndCamSet } from "./rnd/rnd";
+import { getTimeContext, TimeContext } from "./timer.ts";
 
 export class InputContext {
   keysOld: boolean[] = new Array(256).fill(false);
@@ -148,17 +149,21 @@ export function inputInit() {
 }
 
 export function inputResponse() {
+  const tc: TimeContext = getTimeContext();
   const rc: RenderContext = getRenderContext();
   const ac: AnimContext = getAnimContext();
-  let deltaPos: mth.vec3 = mth.vec3MulNum(ac.playerDir, 0.047 * (1 + Number(input.shiftKey)));
+
+  let deltaPos: mth.vec3 = mth.vec3MulNum(ac.playerDir, 3.0 * tc.localDeltaTime * (1 + Number(input.shiftKey)));
   if (input.keys["w".charCodeAt(0)] || input.keys["s".charCodeAt(0)]) {
     if (input.keys["s".charCodeAt(0)]) deltaPos = mth.vec3Neg(deltaPos);
     ac.playerPos = mth.vec3AddVec3(ac.playerPos, deltaPos);
     const newY: number = getPointHeight(ac.playerPos.x, ac.playerPos.z);
+    const deltaY: number = newY - ac.playerPos.y;
     ac.playerPos.y = newY;
-    rndCamSet(mth.vec3AddVec3(rc.camLoc, deltaPos), mth.vec3SubVec3(ac.playerPos, mth.vec3Set(0, newY - 18, 0)), mth.vec3Set(0, 1, 0));
+    deltaPos.y = deltaY;
+    rndCamSet(mth.vec3AddVec3(rc.camLoc, deltaPos), mth.vec3AddVec3(ac.playerPos, mth.vec3Set(0, 0, 0)), mth.vec3Set(0, 1, 0));
   }
-  let deltaAngle: number = 3.0;
+  let deltaAngle: number = 30 * tc.localDeltaTime;
   if (input.keys["a".charCodeAt(0)] || input.keys["d".charCodeAt(0)]) {
     if (input.keys["d".charCodeAt(0)]) deltaAngle *= -1;
     ac.playerDir = mth.vec3MulMat4(ac.playerDir, mth.mat4RotateY(deltaAngle));

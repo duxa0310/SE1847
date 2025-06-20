@@ -9,7 +9,7 @@ import { mtlGetDefault } from "../anim/rnd/res/mtl.ts";
 import { getAnimContext } from "../anim/anim.ts";
 
 export function getPointHeight(x: number, z: number): number {
-  return 8 * mth.noiseTurb2D(x / 100, z / 100, 7);
+  return 8 * mth.noiseTurb2D(x / 80, z / 80, 6) - 15;
 }
 
 function createChunkPrimitive(x0: number, y0: number, z0: number, w: number, h: number, tessW: number, tessH: number): prim.Primitive {
@@ -33,7 +33,7 @@ function createChunkPrimitive(x0: number, y0: number, z0: number, w: number, h: 
         p01: Vertex = vertices[i][j + 1],
         p10: Vertex = vertices[i + 1][j],
         p11: Vertex = vertices[i + 1][j + 1];
-      let n = mth.vec3Normalize(mth.vec3CrossVec3(mth.vec3SubVec3(p00.position, p10.position), mth.vec3SubVec3(p11.position, p10.position)));
+      let n: mth.vec3 = mth.vec3Normalize(mth.vec3CrossVec3(mth.vec3SubVec3(p00.position, p10.position), mth.vec3SubVec3(p11.position, p10.position)));
       p00.normal = mth.vec3AddVec3(p00.normal, n);
       p10.normal = mth.vec3AddVec3(p10.normal, n);
       p11.normal = mth.vec3AddVec3(p11.normal, n);
@@ -66,6 +66,10 @@ function createChunkPrimitive(x0: number, y0: number, z0: number, w: number, h: 
   return prim.primCreate(window.gl.TRIANGLE_STRIP, mtlGetDefault(), verticesList, indices);
 }
 
+const maxChunksRenderCount: number = 32;
+const chunkSize: number = 16;
+const tessCount: number = 16;
+
 export class UnitGrid extends Unit {
   prim!: prim.Primitive;
   lands: prim.Primitive[] = [];
@@ -77,15 +81,11 @@ export class UnitGrid extends Unit {
   constructor() {
     super("Grid");
     const loc: mth.vec3 = getAnimContext().playerPos;
-    this.locX = (loc.x / 32) >> 0;
-    this.locZ = (loc.z / 32) >> 0;
+    this.locX = (loc.x / chunkSize) >> 0;
+    this.locZ = (loc.z / chunkSize) >> 0;
   }
 
   async init() {
-    const x0: number = 0, y0: number = 0, z0: number = 0;
-    const w: number = 32, h: number = 32;
-    const tessW: number = 32, tessH: number = 32;
-
     const mtlLand: mtl.Material = new mtl.Material("Land material", mth.vec3Set1(1), mth.vec3Set1(0.8), mth.vec3Set1(0), 30, 1, shd.shdGetDefault());
     mtlLand.textures[0] = tex.texCreateImage("Land texture", "bin/textures/land_grass.jpg", 1, 1);
     this.mtl = mtlLand;
@@ -93,15 +93,15 @@ export class UnitGrid extends Unit {
 
   response() {
     const loc: mth.vec3 = getAnimContext().playerPos;
-    const x0: number = (loc.x / 32) >> 0, z0: number = (loc.z / 32) >> 0;
+    const x0: number = (loc.x / chunkSize) >> 0, z0: number = (loc.z / chunkSize) >> 0;
 
     if (x0 != this.locX || z0 != this.locZ || this.flagFirst) {
       this.flagFirst = false;
       this.lands = [];
-      for (let i: number = -3; i < 4; i++) {
-        for (let j: number = -3; j < 4; j++) {
-          const prim: prim.Primitive = createChunkPrimitive(x0 * 32 + i * 32, 0, z0 * 32 + j * 32, 32, 32,
-            (32 / (Math.abs(j) + 1)) >> 0, (32 / (Math.abs(i) + 1)) >> 0);
+      for (let i: number = (-maxChunksRenderCount / 2) >> 0; i < maxChunksRenderCount / 2; i++) {
+        for (let j: number = (-maxChunksRenderCount / 2) >> 0; j < maxChunksRenderCount / 2; j++) {
+          const prim: prim.Primitive = createChunkPrimitive((x0 + i) * chunkSize, 0, (z0 + j) * chunkSize, chunkSize, chunkSize,
+            Math.max((tessCount / (1 + 0.5 * Math.abs(j))) >> 0, 2), Math.max((tessCount / (1 + 0.5 * Math.abs(i))) >> 0, 2));
           prim.mtl = this.mtl;
           this.lands.push(prim);
         }

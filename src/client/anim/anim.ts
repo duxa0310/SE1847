@@ -13,6 +13,7 @@ import { UnitAxis } from "../units/u_axis.ts";
 import { UnitModel } from "../units/u_model.ts";
 import { getPointHeight, UnitGrid } from "../units/u_grid.ts";
 import { texCreateImage } from "./rnd/res/tex.ts";
+import { UnitModel } from "../units/u_model.ts";
 
 declare global {
   interface Window {
@@ -56,7 +57,11 @@ export async function animInit() {
   units.unitAdd(new UnitSkybox());
   units.unitAdd(new UnitAxis());
   units.unitAdd(new UnitGrid());
+<<<<<<< HEAD
+  // units.unitAdd(new UnitModel());
+=======
   units.unitAdd(new UnitModel());
+>>>>>>> 33b553495c9899b32e632fb90f017a852fc35aba
   await units.unitsInit();
 
   const mtlPlayer: mtl.Material = new mtl.Material("Player material", mth.vec3Set1(1), mth.vec3Set1(1), mth.vec3Set1(1), 30, 1,
@@ -76,7 +81,7 @@ function animDrawPlayer(loc: mth.vec3, dir: mth.vec3) {
       mth.mat4RotateY(mth.radiansToDegrees(Math.atan2(dir.x, dir.z))),
       mth.mat4Rotate(mth.radiansToDegrees(-Math.acos(mth.vec3DotVec3(landNormal, mth.vec3Set(0, 1, 0)))), mth.vec3Normalize(normCrossUp))
     ),
-    mth.mat4Translate(mth.vec3AddVec3(loc, mth.vec3Set(0, 1.5, 0)))
+    mth.mat4Translate(mth.vec3AddVec3(loc, mth.vec3Set(0, 1.30, 0)))
   ));
 }
 

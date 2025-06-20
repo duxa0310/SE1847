@@ -38,7 +38,7 @@ void main()
     color = vec4(Ka * DrawColor.xyz, 1.0);
   }
 
-  color.xyz *= Shade(DrawPos, normalize(DrawNormal), 
+  color.xyz *= 1.02 * Shade(DrawPos, normalize(DrawNormal), 
       KdTrans.xyz, KsPh.xyz, KsPh.w, normalize(vec3(0.0, 1.0, 0.0)), vec3(1.0, 1.0, 1.0));
   
   OutColor = vec4(color.xyz, KdTrans.w); 
