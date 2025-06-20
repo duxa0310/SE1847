@@ -1,5 +1,6 @@
 import * as mth from "../mth/mth.ts";
 import * as prim from "./rnd/prim.ts";
+import * as mdl from "./rnd/model.ts";
 import * as rnd from "./rnd/rnd.ts";
 import * as time from "./timer.ts";
 import * as input from "./input.ts";
@@ -9,6 +10,7 @@ import * as units from "../units/units.ts";
 import * as mrk from "./rnd/res/mrk.ts";
 import { UnitSkybox } from "../units/u_skybox.ts";
 import { UnitAxis } from "../units/u_axis.ts";
+import { UnitModel } from "../units/u_model.ts";
 import { getPointHeight, UnitGrid } from "../units/u_grid.ts";
 import { texCreateImage } from "./rnd/res/tex.ts";
 
@@ -47,12 +49,14 @@ export async function animInit() {
   rnd.rndInit();
   time.timerInit();
   input.inputInit();
+  mdl.mdlInit();
   await shd.shdInit();
   mtl.mtlInit();
   mrk.mrkInit();
   units.unitAdd(new UnitSkybox());
   units.unitAdd(new UnitAxis());
   units.unitAdd(new UnitGrid());
+  units.unitAdd(new UnitModel());
   await units.unitsInit();
 
   const mtlPlayer: mtl.Material = new mtl.Material("Player material", mth.vec3Set1(1), mth.vec3Set1(1), mth.vec3Set1(1), 30, 1,
@@ -86,7 +90,7 @@ export function animRender() {
   if (playersMap != undefined) {
     for (let name of playersMap.keys()) {
       const playerContext = playersMap.get(name) || { online: false, loc: mth.vec3Set1(0), dir: mth.vec3Set1(0) };
-      console.log(name, playerContext);
+      //console.log(name, playerContext);
 
       if (playerContext.online && playerContext.loc != undefined) {
         animDrawPlayer(playerContext.loc, playerContext.dir)

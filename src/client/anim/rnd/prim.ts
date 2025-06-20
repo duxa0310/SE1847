@@ -1,9 +1,11 @@
+/** SE1847: Primitive, 20.06.2025 */
 import { loadTextFromFile } from "../../utils.js";
 import { vec2, vec3, vec4 } from "../../mth/mth.ts"
 import * as mth from "../../mth/mth.ts"
-import { Material } from "./res/mtl.ts"
+import * as mtl from "./res/mtl.ts"
 import { getRenderContext, RenderContext } from "./rnd.ts";
 import { getTimeContext, TimeContext } from "../timer.ts";
+import { shdGetByName } from "./res/shd.ts";
 
 export class Vertex {
   position: vec3;
@@ -62,17 +64,176 @@ export function primAutoNormals(vertices: Vertex[], indices: number[]) {
   }
 }
 
+export function evalBB(vertices: Vertex[]): mth.vec3[] {
+  let minbb: mth.vec3, maxbb: mth.vec3;
+  if (vertices == undefined || vertices.length == 0) {
+    return [mth.vec3Set1(0), mth.vec3Set1(1)];
+  }
+  else {
+    minbb = structuredClone(vertices[0].position);
+    maxbb = structuredClone(vertices[0].position);
+    for (let i = 1; i < vertices.length; i++) {
+      if (minbb.x > vertices[i].position.x)
+        minbb.x = vertices[i].position.x;
+      else if (maxbb.x < vertices[i].position.x)
+        maxbb.x = vertices[i].position.x;
+
+      if (minbb.y > vertices[i].position.y)
+        minbb.y = vertices[i].position.y;
+      else if (maxbb.y < vertices[i].position.y)
+        maxbb.y = vertices[i].position.y;
+
+      if (minbb.z > vertices[i].position.z)
+        minbb.z = vertices[i].position.z;
+      else if (maxbb.z < vertices[i].position.z)
+        maxbb.z = vertices[i].position.z;
+    }
+  }
+
+  let bb: mth.vec3[] = [];
+
+  bb[0] = minbb;
+  bb[1] = mth.vec3Set(minbb.x, minbb.y, maxbb.z);
+  bb[2] = mth.vec3Set(maxbb.x, minbb.y, maxbb.z);
+  bb[3] = mth.vec3Set(maxbb.x, minbb.y, minbb.z);
+
+  bb[4] = mth.vec3Set(minbb.x, maxbb.y, minbb.z);
+  bb[5] = mth.vec3Set(minbb.x, maxbb.y, maxbb.z);
+  bb[6] = maxbb;
+  bb[7] = mth.vec3Set(maxbb.x, maxbb.y, minbb.z);
+
+  return bb;
+}
+
+export function recalcPrimBB(prim: Primitive) {
+  for (let i = 0; i < 8; i++) {
+    prim.bb[i] = mth.pointTransform(prim.savebb[i], prim.trans);
+  }
+}
+
+export function drawPrimBBMatr(prim: Primitive) {
+  let vertices: Vertex[] = [
+    new Vertex(prim.bb[0], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(prim.bb[1], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(prim.bb[2], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(prim.bb[3], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+
+    new Vertex(prim.bb[4], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(prim.bb[5], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(prim.bb[6], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(prim.bb[7], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1))];
+  let indices: number[] = [
+    0, 1,
+    1, 2,
+    2, 3,
+    3, 0,
+
+    4, 5,
+    5, 6,
+    6, 7,
+    7, 4,
+
+    0, 4,
+    1, 5,
+    2, 6,
+    3, 7];
+
+  let boundbox: Primitive = primCreate(window.gl.LINES, mtl.mtlGetDefault(), vertices, indices);
+  boundbox.draw(prim.trans);
+}
+
+export function drawPrimBB(prim: Primitive) {
+  let vertices: Vertex[] = [
+    new Vertex(prim.bb[0], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
+    new Vertex(prim.bb[1], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
+    new Vertex(prim.bb[2], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
+    new Vertex(prim.bb[3], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
+
+    new Vertex(prim.bb[4], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
+    new Vertex(prim.bb[5], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
+    new Vertex(prim.bb[6], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1)),
+    new Vertex(prim.bb[7], mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 0, 0, 1))];
+  let indices: number[] = [
+    0, 1,
+    1, 2,
+    2, 3,
+    3, 0,
+
+    4, 5,
+    5, 6,
+    6, 7,
+    7, 4,
+
+    0, 4,
+    1, 5,
+    2, 6,
+    3, 7];
+
+  let boundbox: Primitive = primCreate(window.gl.LINES, mtl.mtlGetDefault(), vertices, indices);
+  boundbox.draw(mth.mat4Identity());
+}
+
+export function drawPrimSaveBB(prim: Primitive) {
+  let vertices: Vertex[] = [
+    new Vertex(mth.vec3Set(prim.savebb[0].x, prim.savebb[0].y, prim.savebb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(mth.vec3Set(prim.savebb[0].x, prim.savebb[6].y, prim.savebb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(mth.vec3Set(prim.savebb[0].x, prim.savebb[6].y, prim.savebb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(mth.vec3Set(prim.savebb[0].x, prim.savebb[0].y, prim.savebb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+
+    new Vertex(mth.vec3Set(prim.savebb[6].x, prim.savebb[0].y, prim.savebb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(mth.vec3Set(prim.savebb[6].x, prim.savebb[6].y, prim.savebb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(mth.vec3Set(prim.savebb[6].x, prim.savebb[6].y, prim.savebb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
+    new Vertex(mth.vec3Set(prim.savebb[6].x, prim.savebb[0].y, prim.savebb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1))];
+  let indices: number[] = [
+    0, 1,
+    1, 2,
+    2, 3,
+    3, 0,
+
+    4, 5,
+    5, 6,
+    6, 7,
+    7, 4,
+
+    0, 4,
+    1, 5,
+    2, 6,
+    3, 7];
+
+  let boundbox: Primitive = primCreate(window.gl.LINES, mtl.mtlGetDefault(), vertices, indices);
+  boundbox.draw(mth.mat4Identity());
+}
+
+export function collidePrim(prim1: Primitive, prim2: Primitive): boolean {
+
+  return false;
+}
+
+export function changePrimTrans(prim: Primitive, trans: mth.mat4) {
+  prim.trans = trans;
+  recalcPrimBB(prim);
+}
+
 export class Primitive {
   glType: number;
-  mtl: Material;
+  mtl: mtl.Material;
   vA!: WebGLVertexArrayObject;
   vBuf!: WebGLBuffer;
   iBuf!: WebGLBuffer;
   numOfElements: number;
+  trans!: mth.mat4;
+  savebb!: mth.vec3[];
+  bb: mth.vec3[];
 
-  constructor(glType: number, mtl: Material, vertices: Vertex[], indices: number[]) {
+  constructor(glType: number, mtl: mtl.Material, vertices: Vertex[], indices: number[]) {
     this.glType = glType;
     this.mtl = mtl;
+    this.trans = mth.mat4Identity()
+
+    this.savebb = evalBB(vertices);
+    this.bb = structuredClone(this.savebb);
+    //console.log(`Creating primitive. minbb: (${this.bb0.x}, ${this.bb0.y}, ${this.bb0.z}), maxbb: (${this.bb6.x}, ${this.bb6.y}, ${this.bb6.z})`);
+
     if (vertices.length > 0) {
       this.vBuf = window.gl.createBuffer();
       this.vA = window.gl.createVertexArray();
@@ -123,6 +284,7 @@ export class Primitive {
     window.gl.uniformMatrix4fv(window.gl.getUniformLocation(this.mtl.shd.program, "MatrW"), false,
       matrW.toArray());
 
+    matrW = mth.mat4MulMat4(matrW, this.trans);
     const matrWVP: mth.mat4 = mth.mat4MulMat4(matrW, getRenderContext().matrVP);
     window.gl.uniformMatrix4fv(window.gl.getUniformLocation(this.mtl.shd.program, "MatrWVP"), false,
       matrWVP.toArray());
@@ -139,11 +301,11 @@ export class Primitive {
   }
 }
 
-export function primCreate(glType: number, mtl: Material, vertices: Vertex[], indices: number[]): Primitive {
+export function primCreate(glType: number, mtl: mtl.Material, vertices: Vertex[], indices: number[]): Primitive {
   return new Primitive(glType, mtl, vertices, indices);
 }
 
-export function primCreateFromOBJString(primSrc: string, mtl: Material): Primitive {
+export function primCreateFromOBJString(primSrc: string, mtl: mtl.Material): Primitive {
   const lines: string[] = primSrc.split("\n");
   const isSpace: Function = function (c: string) { return c == ' ' || c == '\n' || c == '\t'; };
 
@@ -216,7 +378,7 @@ export function primCreateFromOBJString(primSrc: string, mtl: Material): Primiti
   return new Primitive(window.gl.TRIANGLES, mtl, vertices, indices);
 }
 
-export async function primCreateFromOBJ(url: string, mtl: Material): Promise<Primitive> {
+export async function primCreateFromOBJ(url: string, mtl: mtl.Material): Promise<Primitive> {
   const modelSrc: string = await loadTextFromFile(url);
   return primCreateFromOBJString(modelSrc, mtl);
 }
