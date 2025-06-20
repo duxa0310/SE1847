@@ -13,7 +13,6 @@ import { UnitAxis } from "../units/u_axis.ts";
 import { UnitModel } from "../units/u_model.ts";
 import { getPointHeight, UnitGrid } from "../units/u_grid.ts";
 import { texCreateImage } from "./rnd/res/tex.ts";
-import { UnitModel } from "../units/u_model.ts";
 
 declare global {
   interface Window {
@@ -50,18 +49,13 @@ export async function animInit() {
   rnd.rndInit();
   time.timerInit();
   input.inputInit();
-  mdl.mdlInit();
   await shd.shdInit();
   mtl.mtlInit();
   mrk.mrkInit();
   units.unitAdd(new UnitSkybox());
   units.unitAdd(new UnitAxis());
   units.unitAdd(new UnitGrid());
-<<<<<<< HEAD
   // units.unitAdd(new UnitModel());
-=======
-  units.unitAdd(new UnitModel());
->>>>>>> 33b553495c9899b32e632fb90f017a852fc35aba
   await units.unitsInit();
 
   const mtlPlayer: mtl.Material = new mtl.Material("Player material", mth.vec3Set1(1), mth.vec3Set1(1), mth.vec3Set1(1), 30, 1,
