@@ -34,109 +34,11 @@ export class Model {
   }
 }
 
-<<<<<<< HEAD
 export function modelCreate(prims: prim.Primitive[]): Model {
   return new Model(prims);
 }
 
 export async function modelCreateFromG3DM(url: string): Promise<Model> {
-=======
-export let models: Model[] = [];
-
-export function modelGetByName(name: string): Model {
-  for (let i: number = 1; i < models.length; i++) {
-    if (models[i].name == name) {
-      return models[i];
-    }
-  }
-  return models[0];
-}
-
-export async function mdlInit() {
-  let mdl1 = await modelCreateFromG3DM("bin/models/helic.g3dm");
-  models.push(mdl1);
-}
-
-export function modelEvalBB(model: Model) {
-  if (model == undefined)
-    return;
-  if (model.prims[0] != null && model.prims.length > 0) {
-    model.bb[0] = structuredClone(model.prims[0].bb[0]);
-    model.bb[6] = structuredClone(model.prims[0].bb[6]);
-  }
-  for (let i = 0; i < model.prims.length; i++) {
-    if (model.bb[0].x > model.prims[i].bb[0].x)
-      model.bb[0].x = model.prims[i].bb[0].x;
-    if (model.bb[6].x < model.prims[i].bb[6].x)
-      model.bb[6].x = model.prims[i].bb[6].x;
-
-    if (model.bb[0].y > model.prims[i].bb[0].y)
-      model.bb[0].y = model.prims[i].bb[0].y;
-    if (model.bb[6].y < model.prims[i].bb[6].y)
-      model.bb[6].y = model.prims[i].bb[6].y;
-
-    if (model.bb[0].z > model.prims[i].bb[0].z)
-      model.bb[0].z = model.prims[i].bb[0].z;
-    if (model.bb[6].z < model.prims[i].bb[6].z)
-      model.bb[6].z = model.prims[i].bb[6].z;
-  }
-}
-
-export function recalcModelBB(model: Model) {
-  for (let i = 0; i < model.prims.length; i++) {
-    model.prims[i].bb[0] = mth.pointTransform(model.prims[i].bb[0], model.trans);
-    model.prims[i].bb[1] = mth.pointTransform(model.prims[i].bb[1], model.trans);
-    model.prims[i].bb[2] = mth.pointTransform(model.prims[i].bb[2], model.trans);
-    model.prims[i].bb[3] = mth.pointTransform(model.prims[i].bb[3], model.trans);
-    model.prims[i].bb[4] = mth.pointTransform(model.prims[i].bb[4], model.trans);
-    model.prims[i].bb[5] = mth.pointTransform(model.prims[i].bb[5], model.trans);
-    model.prims[i].bb[6] = mth.pointTransform(model.prims[i].bb[6], model.trans);
-    model.prims[i].bb[7] = mth.pointTransform(model.prims[i].bb[7], model.trans);
-  }
-}
-
-export function drawModelBB(model: Model) {
-  let vertices: prim.Vertex[] = [
-    new prim.Vertex(mth.vec3Set(model.bb[0].x, model.bb[0].y, model.bb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new prim.Vertex(mth.vec3Set(model.bb[0].x, model.bb[6].y, model.bb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new prim.Vertex(mth.vec3Set(model.bb[0].x, model.bb[6].y, model.bb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new prim.Vertex(mth.vec3Set(model.bb[0].x, model.bb[0].y, model.bb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-
-    new prim.Vertex(mth.vec3Set(model.bb[6].x, model.bb[0].y, model.bb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new prim.Vertex(mth.vec3Set(model.bb[6].x, model.bb[6].y, model.bb[0].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new prim.Vertex(mth.vec3Set(model.bb[6].x, model.bb[6].y, model.bb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1)),
-    new prim.Vertex(mth.vec3Set(model.bb[6].x, model.bb[0].y, model.bb[6].z), mth.vec2Set(0, 0), mth.vec3Set(0, 0, 1), mth.vec4Set(1, 1, 1, 1))];
-  let indices: number[] = [
-    0, 1,
-    1, 2,
-    2, 3,
-    3, 0,
-
-    4, 5,
-    5, 6,
-    6, 7,
-    7, 4,
-
-    0, 4,
-    1, 5,
-    2, 6,
-    3, 7];
-
-  let boundbox: prim.Primitive = prim.primCreate(window.gl.LINES, mtl.mtlGetDefault(), vertices, indices);
-
-  boundbox.draw(model.trans);
-}
-
-function modelAddPrim(model: Model, prim: prim.Primitive): Model {
-  model.prims.push(prim);
-
-  return model;
-}
-
-export async function modelCreateFromG3DM(url: string): Promise<Model> {
-  let model: Model = new Model([]);
-  model.name = url.slice(11);
->>>>>>> 33b553495c9899b32e632fb90f017a852fc35aba
   const dataBuffer: ArrayBuffer = await loadBinaryFromFile(url);
   const buffer: Uint8Array = new Uint8Array(dataBuffer);
 
@@ -225,7 +127,6 @@ export async function modelCreateFromG3DM(url: string): Promise<Model> {
       vertices[j].normal = mth.vectorTransform(vertices[j].normal, tminv);
     }
 
-<<<<<<< HEAD
     const indices: number[] = Array.from(new Uint32Array(dataBuffer.slice(curPos, curPos += 4 * numOfFacetIndices)));
 
     primList.push(prim.primCreate(window.gl.TRIANGLES, defMtl, vertices, indices));
@@ -233,20 +134,4 @@ export async function modelCreateFromG3DM(url: string): Promise<Model> {
   }
 
   return modelCreate(primList);
-=======
-    for (i = 0; i < numOfVertices; i++) {
-      v[i].position = mth.pointTransform(v[i].position, tm);
-      v[i].normal = mth.vectorTransform(v[i].normal, tminv);
-    }
-
-    model = modelAddPrim(model, prim.primCreate(window.gl.TRIANGLES, defMtl, v, ind));
-    model.prims[j].mtl = materials[mtlNo];
-    model.prims[j].trans = mth.mat4Identity();
-  }
-
-  modelEvalBB(model);
-  console.log(`Model loaded. bb[0]: (${model.bb[0].x}, ${model.bb[0].y}, ${model.bb[0].z}), bb[6]: (${model.bb[6].x}, ${model.bb[6].y}, ${model.bb[6].z})`);
-
-  return model;
->>>>>>> 33b553495c9899b32e632fb90f017a852fc35aba
 }
