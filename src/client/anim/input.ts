@@ -1,5 +1,7 @@
 import * as mth from "../mth/mth.ts";
+import { UnitBullet } from "../units/u_bullet.ts";
 import { getPointHeight } from "../units/u_grid.ts";
+import { unitAdd } from "../units/units.ts";
 import { AnimContext, getAnimContext } from "./anim.ts";
 import { getRenderContext, RenderContext, rndCamSet } from "./rnd/rnd";
 import { getTimeContext, TimeContext } from "./timer.ts";
@@ -66,9 +68,6 @@ function inputChangeCamRot(deltaAzimuth: number, deltaElevator: number, deltaDis
 }
 
 function onKeyDown(e: KeyboardEvent) {
-  if (e.code != "F12" && e.code != "F11" && e.code != "KeyR") {
-    e.preventDefault();
-  }
   input.keysOld[e.key.charCodeAt(0)] = input.keys[e.key.charCodeAt(0)];
   input.keys[e.key.charCodeAt(0)] = true;
   input.keysClick[e.key.charCodeAt(0)] = !input.keysOld[e.key.charCodeAt(0)] && input.keys[e.key.charCodeAt(0)];
@@ -79,9 +78,6 @@ function onKeyDown(e: KeyboardEvent) {
 }
 
 function onKeyUp(e: KeyboardEvent) {
-  if (e.code != "F12" && e.code != "F11" && e.code != "KeyR") {
-    e.preventDefault();
-  }
   input.keysOld[e.key.charCodeAt(0)] = input.keys[e.key.charCodeAt(0)];
   input.keys[e.key.charCodeAt(0)] = false;
   input.keysClick[e.key.charCodeAt(0)] = false;
@@ -153,6 +149,14 @@ export function inputResponse() {
   const rc: RenderContext = getRenderContext();
   const ac: AnimContext = getAnimContext();
 
+  if (input.keysClick[" ".charCodeAt(0)]) {
+    input.keysClick[" ".charCodeAt(0)] = false;
+
+    unitAdd(new UnitBullet(
+      mth.vec3AddVec3(mth.vec3AddVec3(ac.playerPos, mth.vec3Set(4.7 * ac.playerDir.x, 0, 4.7 * ac.playerDir.z)), mth.vec3Set(0, 3.0, 0)),
+      mth.vec3MulNum(ac.playerDir, 80))
+    );
+  }
   let deltaPos: mth.vec3 = mth.vec3MulNum(ac.playerDir, 3.0 * tc.localDeltaTime * (1 + Number(input.shiftKey)));
   if (input.keys["w".charCodeAt(0)] || input.keys["s".charCodeAt(0)]) {
     if (input.keys["s".charCodeAt(0)]) deltaPos = mth.vec3Neg(deltaPos);

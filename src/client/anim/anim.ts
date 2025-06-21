@@ -21,13 +21,14 @@ declare global {
   }
 }
 
-let playersMap: Map<String, {
+export let playersMap: Map<String, {
   online: boolean,
   loc: mth.vec3,
-  dir: mth.vec3
+  dir: mth.vec3,
+  hit: boolean
 }>;
 
-export function setPlayersMap(map: Map<String, { online: boolean, loc: mth.vec3, dir: mth.vec3 }>) {
+export function setPlayersMap(map: Map<String, { online: boolean, loc: mth.vec3, dir: mth.vec3, hit: boolean }>) {
   playersMap = map;
 }
 
@@ -91,7 +92,7 @@ export function animRender() {
 
   if (playersMap != undefined) {
     for (let name of playersMap.keys()) {
-      const playerContext = playersMap.get(name) || { online: false, loc: mth.vec3Set1(0), dir: mth.vec3Set1(0) };
+      const playerContext = playersMap.get(name) || { online: false, loc: mth.vec3Set1(0), dir: mth.vec3Set1(0), hit: false };
       //console.log(name, playerContext);
 
       if (playerContext.online && playerContext.loc != undefined) {

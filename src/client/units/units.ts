@@ -10,11 +10,15 @@ export class Unit {
   render() { }
 }
 
-const unitList: Unit[] = [];
+let unitList: Unit[] = [];
 
 export function unitAdd(unit: Unit) {
-  console.log("Unit created: " + unit.name);
+  //console.log("Unit created: " + unit.name);
   unitList.push(unit);
+}
+
+export function unitDelete(unit: Unit) {
+  unitList = unitList.filter((u) => u != unit);
 }
 
 export async function unitsInit() {

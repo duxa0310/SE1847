@@ -25,6 +25,18 @@ const io = new Server(server);
 
 const clients = []; // Sockets list
 
+class Message {
+  username;
+  message;
+
+  constructor(username, message) {
+    this.username = username;
+    this.message = message;
+  }
+}
+
+let messages = [];
+
 /* App handle */
 
 app.get("/", (req, res) => {
@@ -73,11 +85,35 @@ io.on("connection", (socket) => {
     console.log(`Player ${username} connected to game`);
   });
 
+  socket.on("getMessages", () => {
+    socket.emit("printMessages", messages)
+  });
+
   socket.on("updatePlayerData", (playerStr) => {
     const playerObj = JSON.parse(playerStr);
     playersMap[playerObj.name] = playerObj.data;
     for (let client of clients) {
       client.emit("getServerData", JSON.stringify(playersMap));
+    }
+  });
+
+  socket.on("sendMessage", (username, message) => {
+    messages.push(new Message(username, message));
+    console.log(`User ${username} sent a message: ${message}`);
+    for (let client of clients) {
+      if (client.username != username) {
+        client.emit("getMessage", messages);
+      }
+    }
+  });
+
+  socket.on("hitPlayer", (obj) => {
+    for (let client of clients) {
+      if (client.username == obj.target) {
+        client.emit("getHit", {
+          shooter: obj.shooter
+        });
+      }
     }
   });
 

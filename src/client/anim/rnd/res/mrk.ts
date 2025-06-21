@@ -15,8 +15,8 @@ export function mrkDrawSphere(p0: mth.vec3, r: mth.vec3, c: mth.vec4, trans: mth
   spherePrim.draw(mth.mat4MulMat4(
     trans,
     mth.mat4MulMat4(
+      mth.mat4Scale(r),
       mth.mat4Translate(p0),
-      mth.mat4Scale(r)
     )
   ));
 }

@@ -42,7 +42,7 @@ export class UnitModel extends Unit {
     prim.primDrawOBB(this.prim2);
 
     if (col.obbCollision(this.prim1.BB, this.prim2.BB)) {
-      console.log("Collision detected.");
+      //console.log("Collision detected.");
     }
   }
 }

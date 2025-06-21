@@ -106,7 +106,6 @@ export class UnitGrid extends Unit {
           this.lands.push(prim);
         }
       }
-      console.log(x0, z0);
       this.locX = x0;
       this.locZ = z0;
     }
